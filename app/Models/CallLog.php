@@ -5,27 +5,24 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\SoftDeletes;
-
 class CallLog extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory;
 
     protected $fillable = [
         'user_id',
         'customer_id',
         'called_at',
         'result',
-        'duration_seconds',
-        'memo',
+        'next_call_date',
+        'notes',
     ];
 
     protected $casts = [
         'called_at' => 'datetime',
-        'duration_seconds' => 'integer',
+        'next_call_date' => 'date',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
-        'deleted_at' => 'datetime',
     ];
 
     /**
@@ -68,6 +65,14 @@ class CallLog extends Model
      */
     public function scopeSuccessful($query)
     {
-        return $query->where('result', 'connected');
+        return $query->where('result', 'success');
+    }
+
+    /**
+     * アポ獲得のスコープ
+     */
+    public function scopeAppointment($query)
+    {
+        return $query->where('result', 'appointment');
     }
 }
