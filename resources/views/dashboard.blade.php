@@ -29,15 +29,15 @@
                     <!-- 数値表示 -->
                     <div class="flex justify-between items-end mb-3">
                         <div class="flex items-baseline space-x-2">
-                            <span class="text-4xl font-bold text-black" x-text="callCount">42</span>
+                            <span class="text-4xl font-bold text-black" x-text="callCount">{{ $kpiData['todayCallsCount'] }}</span>
                             <span class="text-lg text-gray-800">件</span>
                         </div>
                         <div class="text-right">
                             <div class="text-lg font-semibold text-blue-700">
-                                <span x-text="Math.round(callCount / dailyTarget * 100)">84</span><span>% 達成</span>
+                                <span x-text="Math.round(callCount / dailyTarget * 100)">{{ $kpiData['weeklyTarget'] ? round(($kpiData['todayCallsCount'] / ($kpiData['weeklyTarget']->call_target / 5)) * 100, 1) : 0 }}</span><span>% 達成</span>
                             </div>
                             <div class="text-sm text-gray-700">
-                                目標: <span x-text="dailyTarget">50</span>件
+                                目標: <span x-text="dailyTarget">{{ $kpiData['weeklyTarget'] ? round($kpiData['weeklyTarget']->call_target / 5) : 50 }}</span>件
                             </div>
                         </div>
                     </div>
@@ -95,8 +95,8 @@
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm font-medium text-gray-600">週次進捗率</p>
-                        <p class="text-3xl font-bold text-gray-900 mt-2">78%</p>
-                        <p class="text-sm text-blue-600 mt-1">🎯 残り2日</p>
+                        <p class="text-3xl font-bold text-gray-900 mt-2">{{ $kpiData['weeklyProgress'] }}%</p>
+                        <p class="text-sm text-blue-600 mt-1">🎯 {{ 5 - now()->dayOfWeek }}日残り</p>
                     </div>
                     <div class="p-3 bg-blue-50 rounded-lg">
                         <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -111,13 +111,13 @@
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm font-medium text-gray-600">架電成功率</p>
-                        <p class="text-3xl font-bold text-gray-900 mt-2">65%</p>
+                        <p class="text-3xl font-bold text-gray-900 mt-2">{{ $kpiData['callSuccessRate'] }}%</p>
                         <p class="text-sm text-green-600 mt-1">
                             <span class="inline-flex items-center">
                                 <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
                                     <path fill-rule="evenodd" d="M5.293 9.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 7.414V15a1 1 0 11-2 0V7.414L6.707 9.707a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
                                 </svg>
-                                📈 +5%↑
+                                📈 今週実績
                             </span>
                         </p>
                     </div>
@@ -134,13 +134,13 @@
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm font-medium text-gray-600">アポ獲得数</p>
-                        <p class="text-3xl font-bold text-gray-900 mt-2">8件</p>
+                        <p class="text-3xl font-bold text-gray-900 mt-2">{{ $kpiData['appointmentsCount'] }}件</p>
                         <p class="text-sm text-green-600 mt-1">
                             <span class="inline-flex items-center">
                                 <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
                                     <path fill-rule="evenodd" d="M5.293 9.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 7.414V15a1 1 0 11-2 0V7.414L6.707 9.707a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
                                 </svg>
-                                🤝 +2件↑
+                                🤝 今日獲得
                             </span>
                         </p>
                     </div>
@@ -157,8 +157,8 @@
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm font-medium text-gray-600">平均架電時間</p>
-                        <p class="text-3xl font-bold text-gray-900 mt-2">3.2分</p>
-                        <p class="text-sm text-blue-600 mt-1">📊 -0.3分</p>
+                        <p class="text-3xl font-bold text-gray-900 mt-2">{{ $kpiData['averageCallTime'] }}分</p>
+                        <p class="text-sm text-blue-600 mt-1">📊 平均時間</p>
                     </div>
                     <div class="p-3 bg-blue-50 rounded-lg">
                         <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -283,16 +283,30 @@
 <script>
 function callMeter() {
     return {
-        callCount: 42,
-        dailyTarget: 50,
-        lastUpdated: '14:45',
+        callCount: {{ $kpiData['todayCallsCount'] }},
+        dailyTarget: {{ $kpiData['weeklyTarget'] ? round($kpiData['weeklyTarget']->call_target / 5) : 50 }},
+        lastUpdated: '{{ now()->format("H:i") }}',
         
         async incrementCall() {
             try {
-                // 実際のAPIコールの代わりにモックデータ
-                this.callCount++;
-                this.updateLastUpdated();
-                console.log('架電数を追加しました');
+                const response = await fetch('{{ route("api.call-logs.increment") }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    this.callCount = data.todayCount;
+                    this.dailyTarget = data.dailyTarget;
+                    this.updateLastUpdated();
+                    console.log(data.message);
+                } else {
+                    console.error('Failed to increment call');
+                }
             } catch (error) {
                 console.error('Error incrementing call:', error);
             }
@@ -302,10 +316,24 @@ function callMeter() {
             if (this.callCount <= 0) return;
             
             try {
-                // 実際のAPIコールの代わりにモックデータ
-                this.callCount--;
-                this.updateLastUpdated();
-                console.log('架電数を修正しました');
+                const response = await fetch('{{ route("api.call-logs.decrement") }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    this.callCount = data.todayCount;
+                    this.dailyTarget = data.dailyTarget;
+                    this.updateLastUpdated();
+                    console.log(data.message);
+                } else {
+                    console.error('Failed to decrement call');
+                }
             } catch (error) {
                 console.error('Error decrementing call:', error);
             }
@@ -320,7 +348,7 @@ function callMeter() {
         },
         
         init() {
-            console.log('Call meter initialized');
+            console.log('Call meter initialized with real API');
         }
     }
 }
@@ -335,7 +363,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 labels: ['月', '火', '水', '木', '金'],
                 datasets: [{
                     label: '架電数',
-                    data: [25, 35, 28, 42, 38],
+                    data: @json($kpiData['weeklyCallsData']),
                     borderColor: '#1e40af',
                     backgroundColor: 'rgba(30, 64, 175, 0.3)',
                     tension: 0.4,

@@ -22,8 +22,8 @@ class KpiTargetFactory extends Factory
             'user_id' => \App\Models\User::factory(),
             'target_type' => $targetType,
             'target_date' => $targetType === 'weekly' 
-                ? \Carbon\Carbon::parse(fake()->dateTimeBetween('-4 weeks', '+2 weeks'))->startOfWeek()->format('Y-m-d')
-                : \Carbon\Carbon::parse(fake()->dateTimeBetween('-3 months', '+1 month'))->startOfMonth()->format('Y-m-d'),
+                ? now()->startOfWeek()->format('Y-m-d')
+                : now()->startOfMonth()->format('Y-m-d'),
             'call_target' => $targetType === 'weekly' 
                 ? fake()->numberBetween(50, 150)
                 : fake()->numberBetween(200, 600),
