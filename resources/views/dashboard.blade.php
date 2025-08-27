@@ -29,14 +29,14 @@
                     <!-- 数値表示 -->
                     <div class="flex justify-between items-end mb-3">
                         <div class="flex items-baseline space-x-2">
-                            <span class="text-4xl font-bold text-gray-900" x-text="callCount">42</span>
-                            <span class="text-lg text-gray-600">件</span>
+                            <span class="text-4xl font-bold text-black" x-text="callCount">42</span>
+                            <span class="text-lg text-gray-800">件</span>
                         </div>
                         <div class="text-right">
-                            <div class="text-lg font-semibold text-blue-600">
+                            <div class="text-lg font-semibold text-blue-700">
                                 <span x-text="Math.round(callCount / dailyTarget * 100)">84</span><span>% 達成</span>
                             </div>
-                            <div class="text-sm text-gray-500">
+                            <div class="text-sm text-gray-700">
                                 目標: <span x-text="dailyTarget">50</span>件
                             </div>
                         </div>
@@ -45,7 +45,7 @@
                     <!-- プログレスバー -->
                     <div class="w-full bg-gray-200 rounded-full h-6">
                         <div 
-                            class="bg-gradient-to-r from-slate-900 via-blue-900 to-blue-800 h-6 rounded-full transition-all duration-700 ease-in-out shadow-sm"
+                            class="bg-gradient-to-r from-blue-800 via-blue-700 to-blue-600 h-6 rounded-full transition-all duration-700 ease-in-out shadow-sm"
                             :style="{ width: Math.min(callCount / dailyTarget * 100, 100) + '%' }"
                         >
                         </div>
@@ -336,10 +336,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 datasets: [{
                     label: '架電数',
                     data: [25, 35, 28, 42, 38],
-                    borderColor: '#2563eb',
-                    backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                    borderColor: '#1e40af',
+                    backgroundColor: 'rgba(30, 64, 175, 0.3)',
                     tension: 0.4,
-                    fill: true
+                    fill: true,
+                    borderWidth: 3,
+                    pointBackgroundColor: '#1e40af',
+                    pointBorderColor: '#ffffff',
+                    pointBorderWidth: 2,
+                    pointRadius: 5
                 }]
             },
             options: {
