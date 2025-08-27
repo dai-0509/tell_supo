@@ -100,24 +100,28 @@ php artisan serve
 ## 📊 主要画面
 
 ### ダッシュボード
+![ダッシュボード](docs/screenshots/dashboard.png)
 - 架電メーター（リアルタイム更新）
 - KPI表示カード（今日の架電数、成功率、目標達成率）
 - 週次架電グラフ（Chart.js）
 - 今日の架電履歴（最新5件）
 
 ### 顧客管理
+![顧客管理](docs/screenshots/customers.png)
 - 顧客一覧・検索・フィルタリング
 - 新規顧客登録・編集
 - 進捗ステータス管理
 - 架電履歴との連携
 
 ### 架電履歴
+![架電履歴](docs/screenshots/call-logs.png)
 - 架電記録の登録・編集
 - 日付・結果別フィルタ
 - KPI統計表示
 - CSV出力機能
 
 ### KPI管理
+![KPI管理](docs/screenshots/kpi.png)
 - 週次・月次目標設定
 - 達成率の可視化
 - パフォーマンスグラフ
