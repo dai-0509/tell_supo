@@ -50,8 +50,8 @@
 
 ### 1. プロジェクトクローン
 ```bash
-git clone https://github.com/dai-0509/telsupo.git
-cd telsupo
+git clone https://github.com/dai-0509/tell_supo.git
+cd tell_supo
 ```
 
 ### 2. 依存関係インストール
