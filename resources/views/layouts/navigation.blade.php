@@ -1,4 +1,4 @@
-<nav x-data="{ open: false }" class="relative bg-white/80 backdrop-blur-xl border-b border-white/20 shadow-lg sticky top-0 z-50">
+<nav x-data="{ open: false }" class="lg:hidden relative bg-white/80 backdrop-blur-xl border-b border-white/20 shadow-lg sticky top-0 z-50">
     <!-- 装飾的な背景要素 -->
     <div class="absolute inset-0 bg-gradient-to-r from-blue-600/5 via-purple-600/5 to-pink-600/5"></div>
     
@@ -33,11 +33,11 @@
                         <span class="text-lg group-hover:rotate-12 transition-transform duration-300">📞</span>
                         <span>架電履歴</span>
                     </a>
-                    <a href="{{ route('kpi.index') }}" class="group flex items-center space-x-2 px-4 py-2 rounded-xl text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-white/60 transition-all duration-300 hover:scale-105 {{ request()->routeIs('kpi.*') ? 'bg-white/60 text-gray-900' : '' }}">
+                    <a href="{{ route('kpi-targets.index') }}" class="group flex items-center space-x-2 px-4 py-2 rounded-xl text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-white/60 transition-all duration-300 hover:scale-105 {{ request()->routeIs('kpi-targets.*') ? 'bg-white/60 text-gray-900' : '' }}">
                         <span class="text-lg group-hover:rotate-12 transition-transform duration-300">🎯</span>
                         <span>KPI管理</span>
                     </a>
-                    <a href="#" class="group flex items-center space-x-2 px-4 py-2 rounded-xl text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-white/60 transition-all duration-300 hover:scale-105">
+                    <a href="{{ route('scripts.index') }}" class="group flex items-center space-x-2 px-4 py-2 rounded-xl text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-white/60 transition-all duration-300 hover:scale-105 {{ request()->routeIs('scripts.*') ? 'bg-white/60 text-gray-900' : '' }}">
                         <span class="text-lg group-hover:rotate-12 transition-transform duration-300">📝</span>
                         <span>スクリプト</span>
                     </a>
@@ -46,6 +46,55 @@
 
             <!-- Settings Dropdown -->
             <div class="hidden sm:flex sm:items-center sm:space-x-4">
+                <!-- リアルタイム検索バー -->
+                <div class="relative" x-data="globalSearch()">
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <svg class="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                            </svg>
+                        </div>
+                        <input type="text" 
+                               x-model="searchQuery"
+                               x-on:focus="showResults = true"
+                               x-on:keydown.escape="showResults = false"
+                               placeholder="顧客検索..." 
+                               class="block w-64 pl-9 pr-3 py-2 border border-white/30 rounded-xl text-sm bg-white/60 placeholder-gray-400 focus:outline-none focus:bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all duration-200">
+                    </div>
+                    
+                    <!-- 検索結果ドロップダウン -->
+                    <div x-show="showResults && searchQuery.length > 1" 
+                         x-cloak
+                         class="absolute z-50 mt-1 w-full bg-white rounded-lg shadow-lg border border-gray-200 max-h-64 overflow-y-auto">
+                        <div x-show="isLoading" class="p-4 text-center text-gray-500">
+                            <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600 mx-auto"></div>
+                            <span class="ml-2">検索中...</span>
+                        </div>
+                        
+                        <div x-show="!isLoading && results.length === 0" class="p-4 text-center text-gray-500">
+                            検索結果がありません
+                        </div>
+                        
+                        <template x-for="customer in results" :key="customer.id">
+                            <a :href="`/customers/${customer.id}`" 
+                               class="block px-4 py-3 hover:bg-gray-50 border-b border-gray-100 last:border-b-0">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <div class="text-sm font-medium text-gray-900" x-text="customer.company_name"></div>
+                                        <div class="text-xs text-gray-500" x-text="customer.contact_name || 'No contact'"></div>
+                                    </div>
+                                    <div class="flex items-center space-x-2">
+                                        <span x-show="customer.temperature_rating" 
+                                              :class="getTemperatureClass(customer.temperature_rating)"
+                                              class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium"
+                                              x-text="customer.temperature_rating"></span>
+                                    </div>
+                                </div>
+                            </a>
+                        </template>
+                    </div>
+                </div>
+                
                 <!-- Quick Actions -->
                 <button class="group p-3 text-gray-400 hover:text-gray-600 hover:bg-white/60 rounded-xl transition-all duration-300 hover:scale-110 hover:rotate-12">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -152,3 +201,103 @@
         </div>
     </div>
 </nav>
+
+<script>
+function globalSearch() {
+    return {
+        searchQuery: '',
+        results: [],
+        showResults: false,
+        isLoading: false,
+        searchTimer: null,
+        
+        init() {
+            this.$watch('searchQuery', () => {
+                if (this.searchQuery.length > 1) {
+                    this.debounceSearch();
+                } else {
+                    this.results = [];
+                    this.showResults = false;
+                }
+            });
+            
+            // 外部クリックで結果を非表示
+            document.addEventListener('click', (e) => {
+                if (!this.$el.contains(e.target)) {
+                    this.showResults = false;
+                }
+            });
+        },
+        
+        debounceSearch() {
+            this.isLoading = true;
+            clearTimeout(this.searchTimer);
+            this.searchTimer = setTimeout(() => {
+                this.performSearch();
+            }, 300);
+        },
+        
+        async performSearch() {
+            if (!this.searchQuery.trim()) {
+                this.results = [];
+                this.isLoading = false;
+                return;
+            }
+            
+            try {
+                // 実際の検索API呼び出し（モックデータで代替）
+                // const response = await fetch(`/api/customers/search?q=${encodeURIComponent(this.searchQuery)}`);
+                // const data = await response.json();
+                
+                // モックデータ
+                await new Promise(resolve => setTimeout(resolve, 200));
+                
+                const mockResults = [
+                    {
+                        id: 1,
+                        company_name: 'サンプル株式会社',
+                        contact_name: '田中太郎',
+                        temperature_rating: 'A'
+                    },
+                    {
+                        id: 2,
+                        company_name: 'テスト商事',
+                        contact_name: '佐藤花子',
+                        temperature_rating: 'B'
+                    },
+                    {
+                        id: 3,
+                        company_name: 'デモ企業',
+                        contact_name: '鈴木一郎',
+                        temperature_rating: 'C'
+                    }
+                ].filter(customer => 
+                    customer.company_name.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
+                    customer.contact_name.toLowerCase().includes(this.searchQuery.toLowerCase())
+                );
+                
+                this.results = mockResults;
+                this.showResults = true;
+                
+            } catch (error) {
+                console.error('Search error:', error);
+                this.results = [];
+            } finally {
+                this.isLoading = false;
+            }
+        },
+        
+        getTemperatureClass(rating) {
+            const classes = {
+                'A': 'bg-red-100 text-red-800',
+                'B': 'bg-orange-100 text-orange-800',
+                'C': 'bg-yellow-100 text-yellow-800',
+                'D': 'bg-blue-100 text-blue-800',
+                'E': 'bg-green-100 text-green-800',
+                'F': 'bg-gray-100 text-gray-800'
+            };
+            return classes[rating] || 'bg-gray-100 text-gray-800';
+        }
+    }
+}
+</script>

@@ -22,6 +22,8 @@ class Customer extends Model
         'status',
         'priority',
         'memo',
+        'temperature_rating',
+        'area',
     ];
 
     protected $casts = [

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\CustomerController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -20,9 +21,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/api/call-logs/decrement', [DashboardController::class, 'decrementCall'])->name('api.call-logs.decrement');
     
     // 顧客管理
-    Route::get('/customers', function () {
-        return view('customers.index');
-    })->name('customers.index');
+    Route::resource('customers', CustomerController::class);
     
     // 架電履歴
     Route::get('/call-logs', function () {
@@ -30,9 +29,14 @@ Route::middleware('auth')->group(function () {
     })->name('call-logs.index');
     
     // KPI管理
-    Route::get('/kpi', function () {
-        return view('kpi.index');
-    })->name('kpi.index');
+    Route::get('/kpi-targets', function () {
+        return view('kpi-targets.index');
+    })->name('kpi-targets.index');
+    
+    // スクリプト管理
+    Route::get('/scripts', function () {
+        return view('scripts.index');
+    })->name('scripts.index');
 });
 
 require __DIR__.'/auth.php';

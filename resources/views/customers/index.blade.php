@@ -1,583 +1,362 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="min-h-screen bg-gray-50" x-data="customerList()">
-    <!-- ページヘッダー -->
-    <div class="bg-white shadow">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="py-6">
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center">
-                        <h1 class="text-2xl font-bold text-gray-900">👥 顧客管理</h1>
-                    </div>
-                    <button 
-                        @click="openModal"
-                        class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors"
-                    >
-                        ➕ 新規顧客追加
-                    </button>
-                </div>
+<div class="p-6" x-data="customerFilter()">
+    <!-- ヘッダー -->
+    <div class="mb-8">
+        <div class="flex justify-between items-center mb-6">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900">顧客管理</h1>
+                <p class="text-gray-600 mt-1">顧客情報の管理と戦略的分析</p>
             </div>
+            <a href="{{ route('customers.create') }}" 
+               class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-200 flex items-center space-x-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                </svg>
+                <span>新規顧客登録</span>
+            </a>
         </div>
     </div>
 
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <!-- 検索・フィルターエリア -->
-        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
-            <div class="flex flex-col md:flex-row gap-4">
+    <!-- フィルターバー -->
+    <div class="bg-white/80 backdrop-blur-xl rounded-xl p-6 mb-6 border border-white/20 shadow-lg">
+        <form method="GET" action="{{ route('customers.index') }}" class="space-y-4">
+            <!-- 検索バー -->
+            <div class="flex flex-col lg:flex-row gap-4">
                 <div class="flex-1">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">🔍 検索</label>
-                    <input 
-                        type="text" 
-                        x-model="searchTerm"
-                        placeholder="会社名・担当者名で検索"
-                        class="w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                    >
+                    <label for="search" class="block text-sm font-medium text-gray-700 mb-2">会社名・担当者名で検索</label>
+                    <input type="text" 
+                           name="search" 
+                           id="search"
+                           value="{{ request('search') }}"
+                           placeholder="検索キーワードを入力..."
+                           class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                 </div>
-                <div class="md:w-48">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">業界</label>
-                    <select 
-                        x-model="selectedIndustry"
-                        class="w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                    >
-                        <option value="">すべて</option>
-                        <option value="IT">IT</option>
-                        <option value="製造">製造</option>
-                        <option value="金融">金融</option>
-                        <option value="不動産">不動産</option>
-                        <option value="小売">小売</option>
-                        <option value="その他">その他</option>
+                
+                <div class="lg:w-48">
+                    <label for="temperature_rating" class="block text-sm font-medium text-gray-700 mb-2">温度感</label>
+                    <select name="temperature_rating" 
+                            id="temperature_rating"
+                            class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <option value="">全て</option>
+                        <option value="A" {{ request('temperature_rating') == 'A' ? 'selected' : '' }}>A（最高）</option>
+                        <option value="B" {{ request('temperature_rating') == 'B' ? 'selected' : '' }}>B（高）</option>
+                        <option value="C" {{ request('temperature_rating') == 'C' ? 'selected' : '' }}>C（中）</option>
+                        <option value="D" {{ request('temperature_rating') == 'D' ? 'selected' : '' }}>D（低）</option>
+                        <option value="E" {{ request('temperature_rating') == 'E' ? 'selected' : '' }}>E（最低）</option>
+                        <option value="F" {{ request('temperature_rating') == 'F' ? 'selected' : '' }}>F（要検討）</option>
                     </select>
                 </div>
-                <div class="md:w-48">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">企業規模</label>
-                    <select 
-                        x-model="selectedSize"
-                        class="w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                    >
-                        <option value="">すべて</option>
-                        <option value="大企業">大企業</option>
-                        <option value="中堅企業">中堅企業</option>
-                        <option value="中小企業">中小企業</option>
-                        <option value="スタートアップ">スタートアップ</option>
-                    </select>
+                
+                <div class="lg:w-48">
+                    <label for="area" class="block text-sm font-medium text-gray-700 mb-2">エリア</label>
+                    <input type="text" 
+                           name="area" 
+                           id="area"
+                           value="{{ request('area') }}"
+                           placeholder="東京、大阪など"
+                           class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                </div>
+                
+                <div class="lg:w-48">
+                    <label for="industry" class="block text-sm font-medium text-gray-700 mb-2">業界</label>
+                    <input type="text" 
+                           name="industry" 
+                           id="industry"
+                           value="{{ request('industry') }}"
+                           placeholder="IT、製造業など"
+                           class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                 </div>
             </div>
-        </div>
-
-        <!-- 顧客一覧テーブル -->
-        <div class="bg-white shadow-sm rounded-lg border border-gray-200">
-            <!-- テーブルヘッダー（統計情報付き） -->
-            <div class="px-6 py-4 border-b border-gray-200">
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center space-x-6">
-                        <h3 class="text-lg font-semibold text-gray-800">顧客一覧</h3>
-                        <div class="text-sm text-gray-500">
-                            <span x-text="filteredCustomers.length"></span>件 / <span x-text="customers.length"></span>件中
-                        </div>
-                    </div>
-                    <div class="flex items-center space-x-2">
-                        <select class="text-sm border-gray-300 rounded-md">
-                            <option>一括操作</option>
-                            <option>削除</option>
-                            <option>エクスポート</option>
-                        </select>
-                    </div>
+            
+            <!-- ボタン群 -->
+            <div class="flex justify-between items-center">
+                <div class="flex space-x-3">
+                    <button type="submit" 
+                            class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-200 flex items-center space-x-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                        <span>検索</span>
+                    </button>
+                    
+                    <a href="{{ route('customers.index') }}" 
+                       class="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-all duration-200">
+                        リセット
+                    </a>
+                </div>
+                
+                <!-- 結果表示 -->
+                <div class="text-sm text-gray-600">
+                    全{{ $customers->total() }}件中 {{ $customers->firstItem() }}-{{ $customers->lastItem() }}件を表示
                 </div>
             </div>
+        </form>
+    </div>
 
-            <!-- ローディング状態 -->
-            <div x-show="loading" class="flex items-center justify-center py-12">
-                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-                <span class="ml-2 text-gray-500">読み込み中...</span>
-            </div>
-
-            <!-- テーブル本体 -->
-            <div x-show="!loading" class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-gray-50">
+    <!-- 顧客一覧 -->
+    <div class="bg-white/80 backdrop-blur-xl rounded-xl border border-white/20 shadow-lg overflow-hidden">
+        @if($customers->count() > 0)
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead class="bg-gray-50/80 backdrop-blur-xl">
                         <tr>
-                            <th class="px-6 py-3 text-left">
-                                <input type="checkbox" class="rounded border-gray-300">
-                            </th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                会社名
-                            </th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                担当者
-                            </th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                電話番号
-                            </th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                業界
-                            </th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                架電数
-                            </th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                最終架電
-                            </th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                操作
-                            </th>
+                            <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">会社名・担当者</th>
+                            <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">温度感</th>
+                            <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">エリア・業界</th>
+                            <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ステータス</th>
+                            <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">優先度</th>
+                            <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">最終更新</th>
+                            <th class="px-6 py-4 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
                         </tr>
                     </thead>
-                    <tbody class="bg-white divide-y divide-gray-200">
-                        <template x-for="customer in paginatedCustomers" :key="customer.id">
-                            <tr class="hover:bg-gray-50">
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <input type="checkbox" class="rounded border-gray-300">
+                    <tbody class="divide-y divide-gray-200">
+                        @foreach($customers as $customer)
+                            <tr class="hover:bg-blue-50/50 transition-colors duration-200">
+                                <td class="px-6 py-4">
+                                    <div>
+                                        <div class="text-sm font-medium text-gray-900">{{ $customer->company_name }}</div>
+                                        @if($customer->contact_name)
+                                            <div class="text-sm text-gray-500">{{ $customer->contact_name }}</div>
+                                        @endif
+                                        @if($customer->email)
+                                            <div class="text-xs text-gray-400">{{ $customer->email }}</div>
+                                        @endif
+                                    </div>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-sm font-medium text-gray-900" x-text="customer.company_name"></div>
+                                <td class="px-6 py-4">
+                                    @if($customer->temperature_rating)
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                                            {{ $customer->temperature_rating == 'A' ? 'bg-red-100 text-red-800' : 
+                                               ($customer->temperature_rating == 'B' ? 'bg-orange-100 text-orange-800' : 
+                                               ($customer->temperature_rating == 'C' ? 'bg-yellow-100 text-yellow-800' : 
+                                               ($customer->temperature_rating == 'D' ? 'bg-blue-100 text-blue-800' : 
+                                               ($customer->temperature_rating == 'E' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800')))) }}">
+                                            {{ $customer->temperature_rating }}
+                                        </span>
+                                    @else
+                                        <span class="text-gray-400 text-xs">未設定</span>
+                                    @endif
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-sm text-gray-900" x-text="customer.contact_name || '-'"></div>
+                                <td class="px-6 py-4">
+                                    <div class="text-sm text-gray-900">
+                                        @if($customer->area)
+                                            <span class="block">{{ $customer->area }}</span>
+                                        @endif
+                                        @if($customer->industry)
+                                            <span class="block text-gray-500 text-xs">{{ $customer->industry }}</span>
+                                        @endif
+                                    </div>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-sm text-gray-900" x-text="customer.phone"></div>
+                                <td class="px-6 py-4">
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                                        {{ $customer->status == 'new' ? 'bg-blue-100 text-blue-800' : 
+                                           ($customer->status == 'contacted' ? 'bg-yellow-100 text-yellow-800' : 
+                                           ($customer->status == 'interested' ? 'bg-green-100 text-green-800' : 
+                                           ($customer->status == 'not_interested' ? 'bg-red-100 text-red-800' : 
+                                           ($customer->status == 'callback_scheduled' ? 'bg-purple-100 text-purple-800' : 'bg-gray-100 text-gray-800')))) }}">
+                                        {{ match($customer->status) {
+                                            'new' => '新規',
+                                            'contacted' => '連絡済',
+                                            'interested' => '興味あり',
+                                            'not_interested' => '興味なし',
+                                            'callback_scheduled' => 'コールバック予定',
+                                            'closed' => 'クローズ',
+                                            default => $customer->status
+                                        } }}
+                                    </span>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800" x-text="customer.industry || '-'"></span>
+                                <td class="px-6 py-4">
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                                        {{ $customer->priority == 'high' ? 'bg-red-100 text-red-800' : 
+                                           ($customer->priority == 'medium' ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800') }}">
+                                        {{ match($customer->priority) {
+                                            'high' => '高',
+                                            'medium' => '中',
+                                            'low' => '低',
+                                            default => $customer->priority
+                                        } }}
+                                    </span>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                    <span class="font-semibold" x-text="customer.call_count || 0"></span>回
+                                <td class="px-6 py-4 text-sm text-gray-500">
+                                    {{ $customer->updated_at->format('m/d') }}
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    <span x-text="customer.last_called || '-'"></span>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                    <button 
-                                        @click="editCustomer(customer)"
-                                        class="text-blue-600 hover:text-blue-900 mr-3"
-                                    >
-                                        編集
-                                    </button>
-                                    <button 
-                                        @click="deleteCustomer(customer.id)"
-                                        class="text-red-600 hover:text-red-900"
-                                    >
-                                        削除
-                                    </button>
+                                <td class="px-6 py-4 text-right text-sm font-medium">
+                                    <div class="flex justify-end space-x-2">
+                                        <a href="{{ route('customers.show', $customer) }}" 
+                                           class="text-blue-600 hover:text-blue-900 p-1 rounded-md hover:bg-blue-50">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                            </svg>
+                                        </a>
+                                        <a href="{{ route('customers.edit', $customer) }}" 
+                                           class="text-green-600 hover:text-green-900 p-1 rounded-md hover:bg-green-50">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                            </svg>
+                                        </a>
+                                        <form method="POST" action="{{ route('customers.destroy', $customer) }}" class="inline">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" 
+                                                    onclick="return confirm('この顧客を削除してもよろしいですか？')"
+                                                    class="text-red-600 hover:text-red-900 p-1 rounded-md hover:bg-red-50">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                                </svg>
+                                            </button>
+                                        </form>
+                                    </div>
                                 </td>
                             </tr>
-                        </template>
+                        @endforeach
                     </tbody>
                 </table>
-
-                <!-- データなしの場合 -->
-                <div x-show="filteredCustomers.length === 0" class="text-center py-12">
-                    <div class="text-gray-500">
-                        <svg class="w-12 h-12 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
-                        </svg>
-                        <p>顧客データがありません</p>
-                        <p class="text-sm">新しい顧客を追加してください</p>
-                    </div>
-                </div>
             </div>
-
-            <!-- ページネーション -->
-            <div x-show="!loading && totalPages > 1" class="bg-gray-50 px-4 py-3 border-t border-gray-200 sm:px-6">
-                <div class="flex items-center justify-between">
-                    <div class="flex-1 flex justify-between sm:hidden">
-                        <button 
-                            @click="previousPage()"
-                            :disabled="currentPage === 1"
-                            class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
-                        >
-                            前へ
-                        </button>
-                        <button 
-                            @click="nextPage()"
-                            :disabled="currentPage === totalPages"
-                            class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
-                        >
-                            次へ
-                        </button>
-                    </div>
-                    <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-                        <div>
-                            <p class="text-sm text-gray-700">
-                                <span x-text="((currentPage - 1) * itemsPerPage) + 1"></span>
-                                から
-                                <span x-text="Math.min(currentPage * itemsPerPage, filteredCustomers.length)"></span>
-                                件を表示（全<span x-text="filteredCustomers.length"></span>件中）
-                            </p>
-                        </div>
-                        <div>
-                            <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
-                                <button 
-                                    @click="previousPage()"
-                                    :disabled="currentPage === 1"
-                                    class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
-                                >
-                                    ◀
-                                </button>
-                                
-                                <template x-for="page in visiblePages" :key="page">
-                                    <button 
-                                        @click="currentPage = page"
-                                        :class="page === currentPage ? 'bg-blue-50 border-blue-500 text-blue-600' : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'"
-                                        class="relative inline-flex items-center px-4 py-2 border text-sm font-medium"
-                                        x-text="page"
-                                    ></button>
-                                </template>
-                                
-                                <button 
-                                    @click="nextPage()"
-                                    :disabled="currentPage === totalPages"
-                                    class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
-                                >
-                                    ▶
-                                </button>
-                            </nav>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- 新規顧客追加モーダル -->
-    <div x-show="showModal" x-cloak class="fixed inset-0 z-50 overflow-y-auto" @click.away="closeModal">
-        <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"></div>
             
-            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-                <form @submit.prevent="submitForm">
-                    <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                        <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">
-                            <span x-show="!editingCustomer">新規顧客追加</span>
-                            <span x-show="editingCustomer">顧客情報編集</span>
-                        </h3>
-                        
-                        <div class="space-y-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700">会社名 *</label>
-                                <input 
-                                    type="text" 
-                                    x-model="form.company_name"
-                                    required
-                                    class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                                >
-                                <p x-show="errors.company_name" class="mt-1 text-sm text-red-600" x-text="errors.company_name"></p>
-                            </div>
-                            
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700">担当者名</label>
-                                <input 
-                                    type="text" 
-                                    x-model="form.contact_name"
-                                    class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                                >
-                            </div>
-                            
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700">電話番号 *</label>
-                                <input 
-                                    type="tel" 
-                                    x-model="form.phone"
-                                    required
-                                    class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                                >
-                                <p x-show="errors.phone" class="mt-1 text-sm text-red-600" x-text="errors.phone"></p>
-                            </div>
-                            
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700">業界</label>
-                                <select 
-                                    x-model="form.industry"
-                                    class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                                >
-                                    <option value="">選択してください</option>
-                                    <option value="IT">IT</option>
-                                    <option value="製造">製造</option>
-                                    <option value="金融">金融</option>
-                                    <option value="不動産">不動産</option>
-                                    <option value="小売">小売</option>
-                                    <option value="その他">その他</option>
-                                </select>
-                            </div>
-                            
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700">企業規模</label>
-                                <select 
-                                    x-model="form.company_size"
-                                    class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                                >
-                                    <option value="">選択してください</option>
-                                    <option value="大企業">大企業</option>
-                                    <option value="中堅企業">中堅企業</option>
-                                    <option value="中小企業">中小企業</option>
-                                    <option value="スタートアップ">スタートアップ</option>
-                                </select>
-                            </div>
-                            
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700">備考</label>
-                                <textarea 
-                                    x-model="form.notes"
-                                    rows="3"
-                                    class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                                ></textarea>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                        <button 
-                            type="submit"
-                            :disabled="loading"
-                            class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm disabled:opacity-50"
-                        >
-                            <span x-show="!submitting">保存</span>
-                            <span x-show="submitting">保存中...</span>
-                        </button>
-                        <button 
-                            type="button"
-                            @click="closeModal"
-                            class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
-                        >
-                            キャンセル
-                        </button>
-                    </div>
-                </form>
+            <!-- ページネーション -->
+            <div class="px-6 py-4 bg-gray-50/80 backdrop-blur-xl">
+                {{ $customers->links() }}
             </div>
-        </div>
+        @else
+            <div class="text-center py-12">
+                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                </svg>
+                <h3 class="mt-2 text-sm font-medium text-gray-900">顧客が見つかりませんでした</h3>
+                <p class="mt-1 text-sm text-gray-500">検索条件を変更するか、新しい顧客を登録してください。</p>
+                <div class="mt-6">
+                    <a href="{{ route('customers.create') }}" 
+                       class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        <svg class="-ml-1 mr-2 h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd"></path>
+                        </svg>
+                        新規顧客登録
+                    </a>
+                </div>
+            </div>
+        @endif
     </div>
 </div>
 
 <script>
-function customerList() {
+function customerFilter() {
     return {
-        customers: [
-            {
-                id: 1,
-                company_name: '㈱サンプル',
-                contact_name: '田中様',
-                phone: '03-1234-5678',
-                industry: 'IT',
-                company_size: '中堅企業',
-                notes: 'システム開発に興味あり',
-                call_count: 8,
-                last_called: '2025-08-24'
-            },
-            {
-                id: 2,
-                company_name: 'ABC商事',
-                contact_name: '佐藤様',
-                phone: '03-2345-6789',
-                industry: '製造',
-                company_size: '大企業',
-                notes: '',
-                call_count: 3,
-                last_called: '2025-08-23'
-            },
-            {
-                id: 3,
-                company_name: 'XYZ株式会社',
-                contact_name: '鈴木様',
-                phone: '03-3456-7890',
-                industry: '金融',
-                company_size: '大企業',
-                notes: '',
-                call_count: 5,
-                last_called: '2025-08-22'
-            },
-            {
-                id: 4,
-                company_name: 'DEF企業',
-                contact_name: '高橋様',
-                phone: '03-4567-8901',
-                industry: '不動産',
-                company_size: '中小企業',
-                notes: '',
-                call_count: 2,
-                last_called: '2025-08-21'
-            },
-            {
-                id: 5,
-                company_name: 'GHI会社',
-                contact_name: '伊藤様',
-                phone: '03-5678-9012',
-                industry: '小売',
-                company_size: 'スタートアップ',
-                notes: '',
-                call_count: 1,
-                last_called: '2025-08-20'
-            }
-        ],
-        searchTerm: '',
-        selectedIndustry: '',
-        selectedSize: '',
-        loading: false,
-        showModal: false,
-        editingCustomer: null,
-        submitting: false,
-        currentPage: 1,
-        itemsPerPage: 20,
+        // リアルタイムフィルタリング用のデータ
+        searchTerm: '{{ request('search') }}',
+        selectedTemperatureRating: '{{ request('temperature_rating') }}',
+        selectedArea: '{{ request('area') }}',
+        selectedIndustry: '{{ request('industry') }}',
         
-        form: {
-            company_name: '',
-            contact_name: '',
-            phone: '',
-            industry: '',
-            company_size: '',
-            notes: ''
-        },
+        // デバウンス用のタイマー
+        searchTimer: null,
         
-        errors: {},
-        
-        get filteredCustomers() {
-            return this.customers.filter(customer => {
-                const matchesSearch = !this.searchTerm || 
-                    customer.company_name.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-                    (customer.contact_name && customer.contact_name.toLowerCase().includes(this.searchTerm.toLowerCase()));
-                
-                const matchesIndustry = !this.selectedIndustry || customer.industry === this.selectedIndustry;
-                const matchesSize = !this.selectedSize || customer.company_size === this.selectedSize;
-                
-                return matchesSearch && matchesIndustry && matchesSize;
+        init() {
+            // 検索フィールドのリアルタイム更新
+            this.$watch('searchTerm', () => {
+                this.debounceSearch();
+            });
+            
+            this.$watch('selectedTemperatureRating', () => {
+                this.updateFilters();
+            });
+            
+            this.$watch('selectedArea', () => {
+                this.debounceSearch();
+            });
+            
+            this.$watch('selectedIndustry', () => {
+                this.debounceSearch();
             });
         },
         
-        get paginatedCustomers() {
-            const start = (this.currentPage - 1) * this.itemsPerPage;
-            const end = start + this.itemsPerPage;
-            return this.filteredCustomers.slice(start, end);
+        // デバウンス検索（500ms遅延）
+        debounceSearch() {
+            clearTimeout(this.searchTimer);
+            this.searchTimer = setTimeout(() => {
+                this.updateFilters();
+            }, 500);
         },
         
-        get totalPages() {
-            return Math.ceil(this.filteredCustomers.length / this.itemsPerPage);
-        },
-        
-        get visiblePages() {
-            const pages = [];
-            const start = Math.max(1, this.currentPage - 2);
-            const end = Math.min(this.totalPages, this.currentPage + 2);
+        // フィルター条件をURLパラメータに反映
+        updateFilters() {
+            const params = new URLSearchParams();
             
-            for (let i = start; i <= end; i++) {
-                pages.push(i);
+            if (this.searchTerm && this.searchTerm.trim()) {
+                params.append('search', this.searchTerm.trim());
             }
             
-            return pages;
+            if (this.selectedTemperatureRating) {
+                params.append('temperature_rating', this.selectedTemperatureRating);
+            }
+            
+            if (this.selectedArea && this.selectedArea.trim()) {
+                params.append('area', this.selectedArea.trim());
+            }
+            
+            if (this.selectedIndustry && this.selectedIndustry.trim()) {
+                params.append('industry', this.selectedIndustry.trim());
+            }
+            
+            // URLを更新（ページ遷移なし）
+            const newUrl = '{{ route('customers.index') }}' + (params.toString() ? '?' + params.toString() : '');
+            window.history.pushState({}, '', newUrl);
         },
         
-        openModal() {
-            this.showModal = true;
-            this.resetForm();
+        // フィルターをクリア
+        clearFilters() {
+            this.searchTerm = '';
+            this.selectedTemperatureRating = '';
+            this.selectedArea = '';
+            this.selectedIndustry = '';
+            
+            // フォームをクリアして送信
+            document.getElementById('search').value = '';
+            document.getElementById('temperature_rating').value = '';
+            document.getElementById('area').value = '';
+            document.getElementById('industry').value = '';
+            
+            window.location.href = '{{ route('customers.index') }}';
         },
         
-        closeModal() {
-            this.showModal = false;
-            this.editingCustomer = null;
-            this.resetForm();
-        },
-        
-        resetForm() {
-            this.form = {
-                company_name: '',
-                contact_name: '',
-                phone: '',
-                industry: '',
-                company_size: '',
-                notes: ''
+        // 温度感の色クラスを取得
+        getTemperatureRatingClass(rating) {
+            const classes = {
+                'A': 'bg-red-100 text-red-800',
+                'B': 'bg-orange-100 text-orange-800',
+                'C': 'bg-yellow-100 text-yellow-800',
+                'D': 'bg-blue-100 text-blue-800',
+                'E': 'bg-green-100 text-green-800',
+                'F': 'bg-gray-100 text-gray-800'
             };
-            this.errors = {};
+            return classes[rating] || 'bg-gray-100 text-gray-800';
         },
         
-        editCustomer(customer) {
-            this.editingCustomer = customer;
-            this.form = { ...customer };
-            this.showModal = true;
+        // ステータスの色クラスを取得
+        getStatusClass(status) {
+            const classes = {
+                'new': 'bg-blue-100 text-blue-800',
+                'contacted': 'bg-yellow-100 text-yellow-800',
+                'interested': 'bg-green-100 text-green-800',
+                'not_interested': 'bg-red-100 text-red-800',
+                'callback_scheduled': 'bg-purple-100 text-purple-800',
+                'closed': 'bg-gray-100 text-gray-800'
+            };
+            return classes[status] || 'bg-gray-100 text-gray-800';
         },
         
-        async submitForm() {
-            this.submitting = true;
-            this.errors = {};
-            
-            try {
-                // バリデーション
-                if (!this.form.company_name.trim()) {
-                    this.errors.company_name = '会社名は必須です';
-                }
-                if (!this.form.phone.trim()) {
-                    this.errors.phone = '電話番号は必須です';
-                }
-                
-                if (Object.keys(this.errors).length > 0) {
-                    return;
-                }
-                
-                // 実際のAPIコールの代わりにモックデータ
-                await new Promise(resolve => setTimeout(resolve, 1000));
-                
-                if (this.editingCustomer) {
-                    // 編集
-                    const index = this.customers.findIndex(c => c.id === this.editingCustomer.id);
-                    if (index !== -1) {
-                        this.customers[index] = { ...this.form, id: this.editingCustomer.id };
-                    }
-                } else {
-                    // 新規追加
-                    const newCustomer = {
-                        ...this.form,
-                        id: Math.max(...this.customers.map(c => c.id)) + 1,
-                        call_count: 0,
-                        last_called: null
-                    };
-                    this.customers.push(newCustomer);
-                }
-                
-                this.closeModal();
-                
-            } catch (error) {
-                console.error('Error submitting form:', error);
-                this.errors.general = 'エラーが発生しました';
-            } finally {
-                this.submitting = false;
-            }
-        },
-        
-        async deleteCustomer(customerId) {
-            if (!confirm('この顧客を削除しますか？')) {
-                return;
-            }
-            
-            try {
-                // 実際のAPIコールの代わりにモックデータ
-                this.customers = this.customers.filter(c => c.id !== customerId);
-            } catch (error) {
-                console.error('Error deleting customer:', error);
-                alert('削除に失敗しました');
-            }
-        },
-        
-        previousPage() {
-            if (this.currentPage > 1) {
-                this.currentPage--;
-            }
-        },
-        
-        nextPage() {
-            if (this.currentPage < this.totalPages) {
-                this.currentPage++;
-            }
-        },
-        
-        init() {
-            // 検索・フィルター変更時にページをリセット
-            this.$watch('searchTerm', () => this.currentPage = 1);
-            this.$watch('selectedIndustry', () => this.currentPage = 1);
-            this.$watch('selectedSize', () => this.currentPage = 1);
+        // 優先度の色クラスを取得
+        getPriorityClass(priority) {
+            const classes = {
+                'high': 'bg-red-100 text-red-800',
+                'medium': 'bg-yellow-100 text-yellow-800',
+                'low': 'bg-green-100 text-green-800'
+            };
+            return classes[priority] || 'bg-gray-100 text-gray-800';
         }
     }
 }
 </script>
-
-<style>
-[x-cloak] { display: none !important; }
-</style>
 @endsection
