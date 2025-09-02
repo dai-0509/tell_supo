@@ -245,38 +245,22 @@ function globalSearch() {
             }
             
             try {
-                // 実際の検索API呼び出し（モックデータで代替）
-                // const response = await fetch(`/api/customers/search?q=${encodeURIComponent(this.searchQuery)}`);
-                // const data = await response.json();
-                
-                // モックデータ
-                await new Promise(resolve => setTimeout(resolve, 200));
-                
-                const mockResults = [
-                    {
-                        id: 1,
-                        company_name: 'サンプル株式会社',
-                        contact_name: '田中太郎',
-                        temperature_rating: 'A'
-                    },
-                    {
-                        id: 2,
-                        company_name: 'テスト商事',
-                        contact_name: '佐藤花子',
-                        temperature_rating: 'B'
-                    },
-                    {
-                        id: 3,
-                        company_name: 'デモ企業',
-                        contact_name: '鈴木一郎',
-                        temperature_rating: 'C'
+                // 実際の検索API呼び出し
+                const response = await fetch(`/api/customers/search?q=${encodeURIComponent(this.searchQuery)}`, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
                     }
-                ].filter(customer => 
-                    customer.company_name.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
-                    customer.contact_name.toLowerCase().includes(this.searchQuery.toLowerCase())
-                );
+                });
                 
-                this.results = mockResults;
+                if (!response.ok) {
+                    throw new Error('Search failed');
+                }
+                
+                const results = await response.json();
+                this.results = results;
                 this.showResults = true;
                 
             } catch (error) {

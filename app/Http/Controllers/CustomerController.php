@@ -139,4 +139,27 @@ class CustomerController extends Controller
         return redirect()->route('customers.index')
                         ->with('success', '顧客が正常に削除されました。');
     }
+
+    /**
+     * Search customers for global search.
+     */
+    public function search(Request $request)
+    {
+        $query = $request->get('q', '');
+        
+        if (strlen($query) < 2) {
+            return response()->json([]);
+        }
+        
+        $customers = Customer::where('user_id', Auth::id())
+            ->where(function($q) use ($query) {
+                $q->where('company_name', 'like', '%' . $query . '%')
+                  ->orWhere('contact_name', 'like', '%' . $query . '%');
+            })
+            ->select(['id', 'company_name', 'contact_name', 'temperature_rating'])
+            ->limit(8)
+            ->get();
+            
+        return response()->json($customers);
+    }
 }
