@@ -5,16 +5,20 @@
             <div class="flex">
                 <!-- Logo -->
                 <div class="shrink-0 flex items-center">
-                    <a href="{{ route('dashboard') }}">
-                        <x-application-logo class="block h-9 w-auto fill-current text-gray-800" />
-                    </a>
+                  <a href="{{ route('dashboard') }}" class="flex items-center gap-2">
+                    <span class="text-xl font-bold">{{ config('app.name', 'Laravel') }}</span>
+                    <span class="rounded bg-gray-200 px-2 py-0.5 text-xs text-gray-600">beta</span>
+                  </a>
                 </div>
 
                 <!-- Navigation Links -->
-                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                <div class="space-x-8 sm:-my-px sm:ms-10 sm:flex">
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                         {{ __('Dashboard') }}
                     </x-nav-link>
+                    <x-nav-link :href="route('customers.index')" :active="request()->routeIs('customers.*')">顧客</x-nav-link>
+                    <x-nav-link :href="route('calls.index')"     :active="request()->routeIs('calls.*')">通話ログ</x-nav-link>
+                    <x-nav-link :href="route('kpis.index')"      :active="request()->routeIs('kpis.*')">KPI</x-nav-link>
                 </div>
             </div>
 

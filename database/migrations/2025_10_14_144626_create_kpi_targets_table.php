@@ -10,19 +10,19 @@ return new class extends Migration
      * Run the migrations.
      */
     public function up(): void
-{
-    Schema::create('kpi_targets', function (Blueprint $table) {
-        $table->id();
-        $table->foreignId('user_id')->constrained()->cascadeOnDelete();
-        $table->date('target_month');
-        $table->unsignedInteger('calls_target')->default(0);
-        $table->unsignedInteger('appointments_target')->default(0);
-        $table->unsignedInteger('deals_target')->default(0);
-        $table->timestamps();
+    {
+        Schema::create('kpi_targets', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->date('target_month');
+            $table->unsignedInteger('calls_target')->default(0);
+            $table->unsignedInteger('appointments_target')->default(0);
+            $table->unsignedInteger('deals_target')->default(0);
+            $table->timestamps();
 
-        $table->unique(['user_id', 'target_month'], 'user_month_unique');
-    });
-}
+            $table->unique(['user_id', 'target_month'], 'user_month_unique');
+        });
+    }
 
     /**
      * Reverse the migrations.

@@ -17,4 +17,10 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
+Route::middleware(['auth'])->group(function () {
+    Route::view('/customers', 'pages.customers.index')->name('customers.index');
+    Route::view('/calls', 'pages.calls.index')->name('calls.index');
+    Route::view('/kpis', 'pages.kpis.index')->name('kpis.index');
+});
+
 require __DIR__.'/auth.php';
