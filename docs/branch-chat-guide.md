@@ -136,10 +136,22 @@ touch CLAUDE_TASK.md
 git rm CLAUDE_TASK.md
 git commit -m "docs: Remove CLAUDE_TASK.md before PR"
 
-# PR作成
+# PR作成（必ずテンプレート準拠で作成）
 gh pr create --title "feat: Add CustomerRequest validation with phone normalization" \
-             --body "$(cat PR_TEMPLATE.md)"
+             --body "$(cat .github/PULL_REQUEST_TEMPLATE.md)"
 ```
+
+### 🔴 重要：PRテンプレート準拠の徹底
+**必須事項**：
+- `.github/PULL_REQUEST_TEMPLATE.md` のテンプレートに**完全準拠**してPRを作成
+- **スクリーンショット3枚必須**（成功/失敗/空状態）
+- **チェックリスト完全記入**
+- **テスト結果の実際の出力を添付**
+
+**禁止事項**：
+- テンプレートを使わずに独自構成でPR作成
+- スクリーンショットの省略
+- チェックリストの未記入
 
 ### 6. マージ後の整理
 ```bash
