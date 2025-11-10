@@ -345,6 +345,50 @@ A: `CLAUDE_TASK.md` を共有し、**Last Decision** を頻繁に更新。重要
 - [`claude-code-playbook.md`](./claude-code-playbook.md) - 実装テンプレート集
 - [`AGENT_CHAT_INDEX.md`](./AGENT_CHAT_INDEX.md) - チャット履歴管理
 
+## 📝 PHPDocコメント規約
+
+### 基本ルール
+1. **各関数定義箇所に必ず3行コメント**
+   - 1行目: どんな関数か？（概要）
+   - @param: パラメータの型と説明  
+   - @return: 戻り値の型と説明
+
+2. **IDE事情によるエラー対応**
+   - 未定義メソッドエラーが出ている箇所には必ずコメント
+   - エラーが出ている理由を明記
+   - FormRequest等の継承メソッドについても記載
+
+### コメント例
+```php
+/**
+ * 顧客データを新規登録する
+ * @param StoreCustomerRequest $request バリデーション済みの顧客情報
+ * @return RedirectResponse 顧客詳細画面へのリダイレクト
+ */
+public function store(StoreCustomerRequest $request): RedirectResponse
+{
+    // input()はFormRequestクラスから継承されたメソッド
+    $customer = Customer::create($request->validated());
+    
+    return redirect()->route('customers.show', $customer);
+}
+
+/**
+ * バリデーション前にデータを正規化する
+ * prepareForValidationはFormRequestの標準メソッド
+ * @return void
+ */
+protected function prepareForValidation(): void
+{
+    // merge()はIlluminate\Http\Requestから継承されたメソッド
+    if ($this->input('phone')) {
+        $this->merge([
+            'phone' => preg_replace('/[^0-9]/', '', $this->input('phone')),
+        ]);
+    }
+}
+```
+
 ## 📞 サポート
 
 - 運用方法の質問: Issues作成

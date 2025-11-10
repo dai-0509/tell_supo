@@ -8,23 +8,27 @@ use Illuminate\Validation\Rule;
 class StoreCustomerRequest extends FormRequest
 {
     /**
-     * Determine if the user is authorized to make this request.
+     * 顧客登録リクエストの認証を判定する
+     *
+     * @return bool 認証済みユーザーの場合true
      */
     public function authorize(): bool
     {
+        // auth()->check()はLaravelの標準ヘルパー関数
         return auth()->check();
     }
 
     /**
-     * Get the validation rules that apply to the request.
+     * 顧客登録時のバリデーションルールを取得する
      *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string> バリデーションルール配列
      */
     public function rules(): array
     {
         $userId = auth()->id();
 
         return [
+            'user_id' => ['required', 'integer', 'exists:users,id'],
             'company_name' => [
                 'required',
                 'string',
@@ -39,7 +43,7 @@ class StoreCustomerRequest extends FormRequest
                 Rule::unique('customers')->where('user_id', $userId),
             ],
             'phone' => ['nullable', 'string', 'max:30'],
-            'industry' => ['nullable', 'string', 'max:60'],
+            'industry' => ['nullable', 'string', 'in:IT,製造業,小売業,金融業,医療・福祉,教育,建設・不動産,運輸・物流,飲食・宿泊,士業・コンサル,その他'],
             'temperature_rating' => ['nullable', 'string', 'in:A,B,C,D,E,F'],
             'area' => ['nullable', 'string', 'max:60'],
             'status' => ['nullable', 'string', 'max:30'],
@@ -49,9 +53,9 @@ class StoreCustomerRequest extends FormRequest
     }
 
     /**
-     * Get custom messages for validator errors.
+     * カスタムバリデーションエラーメッセージを取得する
      *
-     * @return array<string, string>
+     * @return array<string, string> フィールド別エラーメッセージ配列
      */
     public function messages(): array
     {
@@ -74,32 +78,35 @@ class StoreCustomerRequest extends FormRequest
     }
 
     /**
-     * Prepare the data for validation.
+     * バリデーション前にリクエストデータを正規化する
      */
     protected function prepareForValidation(): void
     {
         // 電話番号の正規化（ハイフン・スペース・括弧を除去）
-        if ($this->phone) {
+        // input()メソッドはFormRequestの親クラス（Illuminate\Http\Request）から継承
+        if ($this->input('phone')) {
+            // merge()メソッドもIlluminate\Http\Requestから継承
             $this->merge([
-                'phone' => preg_replace('/[^0-9]/', '', $this->phone),
+                'phone' => preg_replace('/[^0-9]/', '', $this->input('phone')),
             ]);
         }
 
         // メールアドレスの正規化
-        if ($this->email) {
+        if ($this->input('email')) {
             $this->merge([
-                'email' => strtolower(trim($this->email)),
+                'email' => strtolower(trim($this->input('email'))),
             ]);
         }
 
         // 会社名の前後空白除去
-        if ($this->company_name) {
+        if ($this->input('company_name')) {
             $this->merge([
-                'company_name' => trim($this->company_name),
+                'company_name' => trim($this->input('company_name')),
             ]);
         }
 
         // user_idを自動設定
+        // auth()->id()はLaravelの標準ヘルパー関数
         $this->merge([
             'user_id' => auth()->id(),
         ]);

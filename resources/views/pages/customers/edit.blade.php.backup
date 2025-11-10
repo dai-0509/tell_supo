@@ -1,0 +1,210 @@
+<x-app-layout>
+    <x-slot name="header">
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+            顧客編集: {{ $customer->company_name }}
+        </h2>
+    </x-slot>
+
+    <div class="py-12">
+        <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="p-6 text-gray-900">
+                    <form action="{{ route('customers.update', $customer) }}" method="POST" class="space-y-8">
+                        @csrf
+                        @method('PUT')
+
+                        <!-- 会社名 -->
+                        <div>
+                            <label for="company_name" class="block text-sm font-medium text-gray-700">
+                                会社名 <span class="text-red-500">*</span>
+                            </label>
+                            <input type="text" 
+                                   name="company_name" 
+                                   id="company_name" 
+                                   value="{{ old('company_name', $customer->company_name) }}"
+                                   class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 @error('company_name') border-red-500 @enderror"
+                                   required>
+                            @error('company_name')
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <!-- 担当者名 -->
+                        <div>
+                            <label for="contact_name" class="block text-sm font-medium text-gray-700">
+                                担当者名
+                            </label>
+                            <input type="text" 
+                                   name="contact_name" 
+                                   id="contact_name" 
+                                   value="{{ old('contact_name', $customer->contact_name) }}"
+                                   class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 @error('contact_name') border-red-500 @enderror">
+                            @error('contact_name')
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <!-- メールアドレス・電話番号 -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label for="email" class="block text-sm font-medium text-gray-700">
+                                    メールアドレス
+                                </label>
+                                <input type="email" 
+                                       name="email" 
+                                       id="email" 
+                                       value="{{ old('email', $customer->email) }}"
+                                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 @error('email') border-red-500 @enderror">
+                                @error('email')
+                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+                            <div>
+                                <label for="phone" class="block text-sm font-medium text-gray-700">
+                                    電話番号
+                                </label>
+                                <input type="tel" 
+                                       name="phone" 
+                                       id="phone" 
+                                       value="{{ old('phone', $customer->phone) }}"
+                                       placeholder="090-1234-5678"
+                                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 @error('phone') border-red-500 @enderror">
+                                @error('phone')
+                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <!-- 業界・エリア -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label for="industry" class="block text-sm font-medium text-gray-700">
+                                    業界
+                                </label>
+                                <select name="industry" 
+                                        id="industry" 
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 @error('industry') border-red-500 @enderror">
+                                    <option value="">選択してください</option>
+                                    <option value="IT" {{ old('industry', $customer->industry) === 'IT' ? 'selected' : '' }}>IT</option>
+                                    <option value="製造業" {{ old('industry', $customer->industry) === '製造業' ? 'selected' : '' }}>製造業</option>
+                                    <option value="小売業" {{ old('industry', $customer->industry) === '小売業' ? 'selected' : '' }}>小売業</option>
+                                    <option value="金融業" {{ old('industry', $customer->industry) === '金融業' ? 'selected' : '' }}>金融業</option>
+                                    <option value="医療・福祉" {{ old('industry', $customer->industry) === '医療・福祉' ? 'selected' : '' }}>医療・福祉</option>
+                                    <option value="教育" {{ old('industry', $customer->industry) === '教育' ? 'selected' : '' }}>教育</option>
+                                    <option value="建設・不動産" {{ old('industry', $customer->industry) === '建設・不動産' ? 'selected' : '' }}>建設・不動産</option>
+                                    <option value="運輸・物流" {{ old('industry', $customer->industry) === '運輸・物流' ? 'selected' : '' }}>運輸・物流</option>
+                                    <option value="飲食・宿泊" {{ old('industry', $customer->industry) === '飲食・宿泊' ? 'selected' : '' }}>飲食・宿泊</option>
+                                    <option value="士業・コンサル" {{ old('industry', $customer->industry) === '士業・コンサル' ? 'selected' : '' }}>士業・コンサル</option>
+                                    <option value="その他" {{ old('industry', $customer->industry) === 'その他' ? 'selected' : '' }}>その他</option>
+                                </select>
+                                @error('industry')
+                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+                            <div>
+                                <label for="area" class="block text-sm font-medium text-gray-700">
+                                    エリア
+                                </label>
+                                <input type="text" 
+                                       name="area" 
+                                       id="area" 
+                                       value="{{ old('area', $customer->area) }}"
+                                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 @error('area') border-red-500 @enderror">
+                                @error('area')
+                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <!-- 温度感・優先度 -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label for="temperature_rating" class="block text-sm font-medium text-gray-700">
+                                    温度感
+                                </label>
+                                <select name="temperature_rating" 
+                                        id="temperature_rating" 
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 @error('temperature_rating') border-red-500 @enderror">
+                                    <option value="">選択してください</option>
+                                    <option value="A" {{ old('temperature_rating', $customer->temperature_rating) === 'A' ? 'selected' : '' }}>A (最高)</option>
+                                    <option value="B" {{ old('temperature_rating', $customer->temperature_rating) === 'B' ? 'selected' : '' }}>B (高)</option>
+                                    <option value="C" {{ old('temperature_rating', $customer->temperature_rating) === 'C' ? 'selected' : '' }}>C (中)</option>
+                                    <option value="D" {{ old('temperature_rating', $customer->temperature_rating) === 'D' ? 'selected' : '' }}>D (低)</option>
+                                    <option value="E" {{ old('temperature_rating', $customer->temperature_rating) === 'E' ? 'selected' : '' }}>E (最低)</option>
+                                    <option value="F" {{ old('temperature_rating', $customer->temperature_rating) === 'F' ? 'selected' : '' }}>F (対象外)</option>
+                                </select>
+                                @error('temperature_rating')
+                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+                            <div>
+                                <label for="priority" class="block text-sm font-medium text-gray-700">
+                                    優先度
+                                </label>
+                                <select name="priority" 
+                                        id="priority" 
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 @error('priority') border-red-500 @enderror">
+                                    <option value="">選択してください</option>
+                                    @for($i = 1; $i <= 5; $i++)
+                                        <option value="{{ $i }}" {{ old('priority', $customer->priority) == $i ? 'selected' : '' }}>
+                                            {{ $i }}{{ $i == 1 ? ' (最高)' : ($i == 5 ? ' (最低)' : '') }}
+                                        </option>
+                                    @endfor
+                                </select>
+                                @error('priority')
+                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <!-- ステータス -->
+                        <div>
+                            <label for="status" class="block text-sm font-medium text-gray-700">
+                                ステータス
+                            </label>
+                            <input type="text" 
+                                   name="status" 
+                                   id="status" 
+                                   value="{{ old('status', $customer->status) }}"
+                                   class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 @error('status') border-red-500 @enderror">
+                            @error('status')
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <!-- メモ -->
+                        <div>
+                            <label for="memo" class="block text-sm font-medium text-gray-700">
+                                メモ
+                            </label>
+                            <textarea name="memo" 
+                                      id="memo" 
+                                      rows="4" 
+                                      class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 @error('memo') border-red-500 @enderror">{{ old('memo', $customer->memo) }}</textarea>
+                            @error('memo')
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <!-- ボタン -->
+                        <div class="flex justify-end space-x-3">
+                            <a href="{{ route('customers.show', $customer) }}" 
+                               class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
+                               style="background-color: #6b7280 !important; color: white !important;">
+                                キャンセル
+                            </a>
+                            <button type="submit" 
+                                    class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                                    style="background-color: #3b82f6 !important; color: white !important;">
+                                更新
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</x-app-layout>
