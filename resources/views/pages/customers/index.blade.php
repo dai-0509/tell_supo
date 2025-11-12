@@ -1,14 +1,8 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex justify-between items-center">
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                顧客一覧
-            </h2>
-            <a href="{{ route('customers.create') }}" 
-               class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                新規登録
-            </a>
-        </div>
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+            顧客一覧
+        </h2>
     </x-slot>
 
     <div class="py-12">
@@ -24,6 +18,8 @@
                     @if($customers->count() > 0)
                         <div class="overflow-x-auto">
                             <table class="min-w-full divide-y divide-gray-200">
+                                <!-- モバイル用注記 -->
+                                <caption class="sr-only">顧客一覧テーブル。横スクロール可能。</caption>
                                 <thead class="bg-gray-50">
                                     <tr>
                                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -111,11 +107,11 @@
                             {{ $customers->links() }}
                         </div>
                     @else
-                        <div class="text-center py-16">
+                        <div class="py-16">
                             <p class="text-lg text-gray-600 mb-6">登録中の顧客データがありません。</p>
                             <a href="{{ route('customers.create') }}" 
-                               class="inline-block font-semibold py-3 px-6 rounded text-center"
-                               style="background-color: #2563eb; color: white; text-decoration: none;">
+                               class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded inline-block"
+                               style="background-color: #3b82f6 !important; color: white !important; text-decoration: none;">
                                 新規登録
                             </a>
                         </div>
