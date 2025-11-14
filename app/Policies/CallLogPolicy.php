@@ -5,6 +5,12 @@ namespace App\Policies;
 use App\Models\CallLog;
 use App\Models\User;
 
+/**
+ * 架電記録認可ポリシー
+ *
+ * CallLogモデルに対するユーザーの操作権限を管理
+ * ユーザー単位でのデータ分離を実現するアクセス制御
+ */
 class CallLogPolicy
 {
     /**

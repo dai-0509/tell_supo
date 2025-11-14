@@ -9,8 +9,20 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 
+/**
+ * 顧客管理コントローラー
+ *
+ * 顧客データのCRUD操作を提供するRESTfulコントローラー
+ * ユーザー認可（Policy）、データバリデーション（FormRequest）を統合
+ */
 class CustomerController extends Controller
 {
+    /**
+     * AuthorizesRequestsトレイト
+     *
+     * authorize()メソッドを提供し、Policyベースの認可を実行
+     * $this->authorize('view', $customer) でCustomerPolicyのviewメソッドを呼び出し
+     */
     use AuthorizesRequests;
 
     /**

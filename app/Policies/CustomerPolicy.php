@@ -5,6 +5,12 @@ namespace App\Policies;
 use App\Models\Customer;
 use App\Models\User;
 
+/**
+ * 顧客認可ポリシー
+ *
+ * Customerモデルに対するユーザーの操作権限を管理
+ * ユーザー単位でのデータ分離を実現するアクセス制御
+ */
 class CustomerPolicy
 {
     /**

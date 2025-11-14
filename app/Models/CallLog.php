@@ -8,8 +8,19 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * 架電記録モデル
+ *
+ * 顧客との通話履歴を管理するEloquentモデル
+ * 開始/終了時間、通話結果、持続時間の自動計算機能を提供
+ */
 class CallLog extends Model
 {
+    /**
+     * HasFactoryトレイト
+     *
+     * テスト用のファクトリクラス（CallLogFactory）との連携を提供
+     */
     use HasFactory;
 
     protected $fillable = [

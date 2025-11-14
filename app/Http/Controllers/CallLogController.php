@@ -10,8 +10,20 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 
+/**
+ * 架電記録管理コントローラー
+ *
+ * 顧客との通話履歴のCRUD操作を提供するRESTfulコントローラー
+ * 時間管理、顧客関連付け、通話結果記録機能を統合
+ */
 class CallLogController extends Controller
 {
+    /**
+     * AuthorizesRequestsトレイト
+     *
+     * authorize()メソッドを提供し、Policyベースの認可を実行
+     * $this->authorize('view', $callLog) でCallLogPolicyのviewメソッドを呼び出し
+     */
     use AuthorizesRequests;
 
     /**
