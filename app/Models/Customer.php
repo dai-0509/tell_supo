@@ -8,8 +8,19 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * 顧客モデル
+ *
+ * 顧客の基本情報（会社名、担当者、連絡先等）を管理するEloquentモデル
+ * ユーザー単位でのデータ分離、架電記録との関連付けを提供
+ */
 class Customer extends Model
 {
+    /**
+     * HasFactoryトレイト
+     *
+     * テスト用のファクトリクラス（CustomerFactory）との連携を提供
+     */
     use HasFactory;
 
     protected $fillable = [

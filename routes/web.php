@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CallLogController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
@@ -20,6 +21,7 @@ Route::middleware('auth')->group(function () {
 
 Route::middleware(['auth'])->group(function () {
     Route::resource('customers', CustomerController::class);
+    Route::resource('call-logs', CallLogController::class);
     Route::view('/calls', 'pages.calls.index')->name('calls.index');
     Route::view('/kpis', 'pages.kpis.index')->name('kpis.index');
 });

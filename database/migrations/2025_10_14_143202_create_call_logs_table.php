@@ -13,26 +13,18 @@ return new class extends Migration
     {
         Schema::create('call_logs', function (Blueprint $table) {
             $table->id();
-
-            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('customer_id')->constrained()->cascadeOnDelete();
-
-            $table->dateTime('called_at');
-
-            $table->enum('outcome', [
-                'no_answer',     // 不在
-                'talked',        // 会話あり
-                'appointment',   // アポ獲得
-                'rejected',      // 断り
-                'wrong_number',   // 間違い電話
-            ])->default('talked');
-
-            $table->unsignedInteger('duration_sec')->nullable(); // 通話秒数
-            $table->string('note', 500)->nullable();             // 短いメモ
-
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->foreignId('customer_id')->constrained()->onDelete('cascade');
+            $table->datetime('started_at');
+            $table->datetime('ended_at')->nullable();
+            $table->enum('result', ['connected', 'no_answer', 'busy', 'failed', 'voicemail']);
+            $table->text('notes')->nullable();
             $table->timestamps();
 
-            $table->index(['user_id', 'customer_id', 'called_at']);
+            // インデックス
+            $table->index(['user_id', 'started_at']);
+            $table->index(['customer_id', 'started_at']);
+            $table->index(['result']);
         });
     }
 

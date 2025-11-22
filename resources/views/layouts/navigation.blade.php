@@ -9,10 +9,10 @@
                     <span class="text-xl font-bold">{{ config('app.name', 'Laravel') }}</span>
                     <span class="rounded bg-gray-200 px-2 py-0.5 text-xs text-gray-600">beta</span>
                   </a>
-                  
+
                   <!-- 顧客関連ページでのみ新規登録ボタンを表示 -->
                   @if(request()->routeIs('customers.*'))
-                    <a href="{{ route('customers.create') }}" 
+                    <a href="{{ route('customers.create') }}"
                        class="ml-4 bg-green-500 hover:bg-green-700 text-white text-sm font-semibold py-1 px-3 rounded"
                        style="background-color: #10b981 !important; color: white !important;">
                         + 新規登録
@@ -26,7 +26,7 @@
                         {{ __('Dashboard') }}
                     </x-nav-link>
                     <x-nav-link :href="route('customers.index')" :active="request()->routeIs('customers.*')">顧客</x-nav-link>
-                    <x-nav-link :href="route('calls.index')"     :active="request()->routeIs('calls.*')">通話ログ</x-nav-link>
+                    <x-nav-link :href="route('call-logs.index')"     :active="request()->routeIs('calls.*')">通話ログ</x-nav-link>
                     <x-nav-link :href="route('kpis.index')"      :active="request()->routeIs('kpis.*')">KPI</x-nav-link>
                 </div>
             </div>
@@ -83,11 +83,11 @@
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                 {{ __('Dashboard') }}
             </x-responsive-nav-link>
-            
+
             <!-- 顧客関連ページでのみ新規登録ボタンを表示（モバイル） -->
             @if(request()->routeIs('customers.*'))
                 <div class="px-3 py-2">
-                    <a href="{{ route('customers.create') }}" 
+                    <a href="{{ route('customers.create') }}"
                        class="bg-green-500 hover:bg-green-700 text-white text-sm font-semibold py-2 px-4 rounded block text-center"
                        style="background-color: #10b981 !important; color: white !important;">
                         + 新規登録
