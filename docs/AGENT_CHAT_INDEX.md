@@ -15,12 +15,12 @@
 | カテゴリ | 進行中 | 完了 | 待機中 | 合計 |
 |----------|--------|------|--------|------|
 | 顧客管理（F005/F007） | 0 | 2 | 4 | 6 |
-| 架電管理（F012） | 0 | 0 | 6 | 6 |
+| 架電管理（F012） | 0 | 1 | 5 | 6 |
 | 履歴機能（F010/F011） | 0 | 0 | 4 | 4 |
 | ダッシュボード（F001-F003） | 0 | 0 | 12 | 12 |
 | MVP仕上げ（W4.5） | 0 | 0 | 3 | 3 |
 
-**全体進捗**: 6% (2/31)
+**全体進捗**: 15% (3/31)
 
 ---
 
@@ -47,12 +47,12 @@
 
 | ブランチ | 目的 | Status | Chat | Last Decision | Next Prompt |
 |---------|------|--------|------|---------------|-------------|
-| feat/f012-calllog-basic | 架電記録基本機能統合実装（CRUD/時間管理/顧客関連） | ⏸️ 準備完了 | - | - | F005完了により開始可能 |
-| feat/f012-calllog-02-migration | call_logs テーブル（FK/INDEX/列） | ⏸️ 未開始 | - | - | 01-spec完了後に開始 |
-| feat/f012-calllog-03-formrequest | 未来日時NG・開始<=終了・秒数範囲 | ⏸️ 未開始 | - | - | 02-migration完了後に開始 |
-| feat/f012-calllog-04-controller | 保存時の秒数自動計算・例外処理 | ⏸️ 未開始 | - | - | 03-formrequest完了後に開始 |
-| feat/f012-calllog-05-ui | 架電記録フォーム（顧客検索選択付き） | ⏸️ 未開始 | - | - | 04-controller完了後に開始 |
-| feat/f012-calllog-06-tests | 未来NG/逆転NG/正常のテスト | ⏸️ 未開始 | - | - | 05-ui完了後に開始 |
+| feat/f012-calllog-basic | 架電記録基本機能統合実装（CRUD/UI/Tests/動的通話時間計算） | ✅ 完了 | [PR #3](https://github.com/dai-0509/tell_supo/pull/3) | duration_seconds削除・動的計算・15テスト100%通過 | - |
+| feat/f012-calllog-02-migration | call_logs テーブル（FK/INDEX/列） | ❌ 統合済 | - | basicブランチで統合実装 | - |
+| feat/f012-calllog-03-formrequest | 未来日時NG・開始<=終了・秒数範囲 | ❌ 統合済 | - | basicブランチで統合実装 | - |
+| feat/f012-calllog-04-controller | 保存時の秒数自動計算・例外処理 | ❌ 統合済 | - | basicブランチで統合実装 | - |
+| feat/f012-calllog-05-ui | 架電記録フォーム（顧客検索選択付き） | ❌ 統合済 | - | basicブランチで統合実装 | - |
+| feat/f012-calllog-06-tests | 未来NG/逆転NG/正常のテスト | ❌ 統合済 | - | basicブランチで統合実装 | - |
 
 ---
 
@@ -144,9 +144,9 @@
 ## 🎯 次のアクション
 
 ### 推奨開始順序
-1. **feat/f007-crud-01-spec** - 顧客CRUD仕様書作成
-2. **feat/f007-crud-02-db-constraints** - DBスキーマ設計
-3. **feat/f007-crud-03-formrequest** - バリデーション実装
+1. **feat/f005-search-sort** - 顧客一覧検索・ソート・フィルタ機能
+2. **feat/f001-f003-dashboard-basic** - ダッシュボード基本KPI統合実装  
+3. **feat/f010-logs-01-spec** - 架電記録履歴一覧/検索の仕様策定
 
 ### 並行実装可能
 - **feat/f009-prospect-memo-01** - 見込みメモ機能（独立性高）
@@ -163,6 +163,7 @@
 
 | 日付 | 更新者 | 変更内容 |
 |------|--------|----------|
+| 2025-11-22 | Claude | F012架電記録機能完了、進捗率6%→15%に更新 |
 | 2025-11-04 | システム | 初期テンプレート作成 |
 
 ---
