@@ -2,7 +2,6 @@
 
 namespace App\Http\Requests\CallLog;
 
-use Carbon\Carbon;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -32,7 +31,11 @@ class UpdateCallLogRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'customer_id' => ['required', 'integer', 'exists:customers,id'],
+            'customer_id' => [
+                'required',
+                'integer',
+                'exists:customers,id,user_id,'.auth()->id(),
+            ],
             'started_at' => ['required', 'date', 'before_or_equal:now'],
             'ended_at' => ['nullable', 'date', 'after:started_at'],
             'result' => ['required', Rule::in(['connected', 'no_answer', 'busy', 'failed', 'voicemail'])],
@@ -57,22 +60,5 @@ class UpdateCallLogRequest extends FormRequest
             'result.in' => '無効な通話結果が選択されています。',
             'notes.max' => 'メモは1000文字以内で入力してください。',
         ];
-    }
-
-    /**
-     * バリデーション前にデータを準備
-     * 時間の秒数を再計算
-     */
-    protected function prepareForValidation(): void
-    {
-        // 終了時刻がある場合、持続時間を自動計算
-        if ($this->started_at && $this->ended_at) {
-            $startedAt = Carbon::parse($this->started_at);
-            $endedAt = Carbon::parse($this->ended_at);
-
-            $this->merge([
-                'duration_seconds' => $endedAt->diffInSeconds($startedAt),
-            ]);
-        }
     }
 }

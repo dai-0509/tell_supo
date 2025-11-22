@@ -2,7 +2,6 @@
 
 namespace App\Http\Requests\CallLog;
 
-use Carbon\Carbon;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -32,7 +31,11 @@ class StoreCallLogRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'customer_id' => ['required', 'integer', 'exists:customers,id'],
+            'customer_id' => [
+                'required',
+                'integer',
+                'exists:customers,id,user_id,'.auth()->id(),
+            ],
             'started_at' => ['required', 'date', 'before_or_equal:now'],
             'ended_at' => ['nullable', 'date', 'after:started_at'],
             'result' => ['required', Rule::in(['connected', 'no_answer', 'busy', 'failed', 'voicemail'])],
@@ -61,22 +64,12 @@ class StoreCallLogRequest extends FormRequest
 
     /**
      * バリデーション前にデータを準備
-     * user_idを自動設定し、時間の秒数を計算
+     * user_idを自動設定
      */
     protected function prepareForValidation(): void
     {
         $this->merge([
             'user_id' => auth()->id(),
         ]);
-
-        // 終了時刻がある場合、持続時間を自動計算
-        if ($this->started_at && $this->ended_at) {
-            $startedAt = Carbon::parse($this->started_at);
-            $endedAt = Carbon::parse($this->ended_at);
-
-            $this->merge([
-                'duration_seconds' => $endedAt->diffInSeconds($startedAt),
-            ]);
-        }
     }
 }

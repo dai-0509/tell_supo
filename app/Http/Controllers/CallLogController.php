@@ -65,7 +65,10 @@ class CallLogController extends Controller
      */
     public function store(StoreCallLogRequest $request): RedirectResponse
     {
-        $callLog = CallLog::create($request->validated());
+        $validated = $request->validated();
+        $validated['user_id'] = auth()->id();
+
+        $callLog = CallLog::create($validated);
 
         return redirect()
             ->route('call-logs.show', $callLog)
@@ -115,6 +118,8 @@ class CallLogController extends Controller
      */
     public function update(UpdateCallLogRequest $request, CallLog $callLog): RedirectResponse
     {
+        $this->authorize('update', $callLog);
+
         $callLog->update($request->validated());
 
         return redirect()
