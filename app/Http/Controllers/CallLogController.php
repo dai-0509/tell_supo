@@ -7,6 +7,7 @@ use App\Http\Requests\CallLog\UpdateCallLogRequest;
 use App\Models\CallLog;
 use App\Models\Customer;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 
@@ -61,14 +62,22 @@ class CallLogController extends Controller
      * 新規架電記録データを保存する
      *
      * @param  StoreCallLogRequest  $request  バリデーション済みの架電記録情報
-     * @return RedirectResponse 架電記録詳細画面へのリダイレクト
+     * @return RedirectResponse|JsonResponse 架電記録詳細画面へのリダイレクト又はJSON応答
      */
-    public function store(StoreCallLogRequest $request): RedirectResponse
+    public function store(StoreCallLogRequest $request): RedirectResponse|JsonResponse
     {
         $validated = $request->validated();
         $validated['user_id'] = auth()->id();
 
         $callLog = CallLog::create($validated);
+
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => '架電記録を登録しました',
+                'callLog' => $callLog->load('customer')
+            ]);
+        }
 
         return redirect()
             ->route('call-logs.show', $callLog)

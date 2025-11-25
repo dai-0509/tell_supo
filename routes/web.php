@@ -24,6 +24,9 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('call-logs', CallLogController::class);
     Route::view('/calls', 'pages.calls.index')->name('calls.index');
     Route::view('/kpis', 'pages.kpis.index')->name('kpis.index');
+    
+    // API endpoints for React components
+    Route::get('/api/customers', [CustomerController::class, 'apiIndex'])->name('api.customers.index');
 });
 
 require __DIR__.'/auth.php';
