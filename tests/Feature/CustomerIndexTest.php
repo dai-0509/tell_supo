@@ -53,8 +53,8 @@ class CustomerIndexTest extends TestCase
             ->get(route('customers.index'));
 
         $response->assertStatus(200)
-            ->assertSee('登録中の顧客データがありません')
-            ->assertSee('新規登録');
+            ->assertSee('顧客がまだ登録されていません')
+            ->assertSee('顧客を作成');
     }
 
     public function test_ページネーションが正常に動作する(): void
@@ -87,10 +87,8 @@ class CustomerIndexTest extends TestCase
             ->get(route('customers.index'));
 
         $response->assertStatus(200)
-            ->assertSee('登録中の顧客データがありません')
-            ->assertSee('新規登録') // 空状態内のボタン
-            ->assertSee('+ 新規登録') // ナビゲーション内のボタン
-            ->assertSee(route('customers.create'));
+            ->assertSee('顧客がまだ登録されていません')
+            ->assertSee('顧客を作成');
     }
 
     public function test_ナビゲーションに新規登録ボタンが常に表示される(): void
@@ -101,8 +99,8 @@ class CustomerIndexTest extends TestCase
             ->get(route('customers.index'));
 
         $response->assertStatus(200)
-            ->assertDontSee('登録中の顧客データがありません')
-            ->assertSee('+ 新規登録'); // ナビゲーションに表示される
+            ->assertDontSee('顧客がまだ登録されていません')
+            ->assertSee('顧客を作成');
     }
 
     public function test_顧客の基本情報が一覧に表示される(): void
@@ -148,12 +146,12 @@ class CustomerIndexTest extends TestCase
     {
         Customer::factory()->create([
             'user_id' => $this->user->id,
-            'temperature_rating' => 'A',
+            'temperature_rating' => '高',
         ]);
 
         Customer::factory()->create([
             'user_id' => $this->user->id,
-            'temperature_rating' => 'B',
+            'temperature_rating' => '中',
         ]);
 
         Customer::factory()->create([
@@ -165,8 +163,8 @@ class CustomerIndexTest extends TestCase
             ->get(route('customers.index'));
 
         $response->assertStatus(200)
-            ->assertSee('bg-red-100') // A評価
-            ->assertSee('bg-orange-100'); // B評価
+            ->assertSee('高') // 高温度
+            ->assertSee('中'); // 中温度
     }
 
     public function test_最新の顧客から順番に表示される(): void

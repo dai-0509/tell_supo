@@ -24,8 +24,8 @@ class ProtectedPagesTest extends TestCase
     {
         return [
             ['/customers'],
-            ['/calls'],
-            ['/kpis'],
+            ['/call-logs'],
+            ['/dashboard'],
         ];
     }
 }

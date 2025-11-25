@@ -262,8 +262,8 @@ class CallLogTest extends TestCase
         $response = $this->actingAs($this->user)->get(route('call-logs.index'));
 
         $response->assertOk();
-        $response->assertSee('登録中の架電記録がありません');
-        $response->assertSee('新規架電記録');
+        $response->assertSee('架電記録がまだ登録されていません');
+        $response->assertSee('架電記録を作成');
     }
 
     public function test_guest_cannot_access_call_logs(): void

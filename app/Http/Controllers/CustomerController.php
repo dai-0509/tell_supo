@@ -6,6 +6,7 @@ use App\Http\Requests\Customer\StoreCustomerRequest;
 use App\Http\Requests\Customer\UpdateCustomerRequest;
 use App\Models\Customer;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 
@@ -53,11 +54,19 @@ class CustomerController extends Controller
      * 新規顧客データを保存する
      *
      * @param  StoreCustomerRequest  $request  バリデーション済みの顧客情報
-     * @return RedirectResponse 顧客詳細画面へのリダイレクト
+     * @return RedirectResponse|JsonResponse 顧客詳細画面へのリダイレクト又はJSON応答
      */
-    public function store(StoreCustomerRequest $request): RedirectResponse
+    public function store(StoreCustomerRequest $request): RedirectResponse|JsonResponse
     {
         $customer = Customer::create($request->validated());
+
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => '顧客を登録しました',
+                'customer' => $customer
+            ]);
+        }
 
         return redirect()
             ->route('customers.show', $customer)
@@ -124,5 +133,20 @@ class CustomerController extends Controller
         return redirect()
             ->route('customers.index')
             ->with('success', '顧客を削除しました');
+    }
+
+    /**
+     * React components用の顧客一覧APIエンドポイント
+     *
+     * @return JsonResponse 顧客データのJSON応答
+     */
+    public function apiIndex(): JsonResponse
+    {
+        $customers = Customer::forUser(auth()->id())
+            ->select('id', 'company_name', 'contact_name')
+            ->orderBy('company_name')
+            ->get();
+
+        return response()->json($customers);
     }
 }
