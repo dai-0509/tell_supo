@@ -1,0 +1,193 @@
+<?php
+
+namespace Database\Seeders;
+
+use App\Models\Customer;
+use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use Illuminate\Database\Seeder;
+
+class CustomerSeeder extends Seeder
+{
+    /**
+     * Run the database seeds.
+     */
+    public function run(): void
+    {
+        // user_id = 2 のサンプル顧客データを作成
+        $customers = [
+            [
+                'user_id' => 2,
+                'company_name' => '株式会社アカツキ商事',
+                'contact_name' => '田中太郎',
+                'email' => 'tanaka@akatsuki.co.jp',
+                'phone' => '03-1234-5678',
+                'industry' => 'IT',
+                'temperature_rating' => 'A',
+                'area' => '関東',
+                'status' => '受けブロ',
+                'priority' => 5,
+                'memo' => '大手IT企業。クラウドサービスに興味あり。早急にアプローチ必要。',
+            ],
+            [
+                'user_id' => 2,
+                'company_name' => '有限会社さくら製造',
+                'contact_name' => '山田花子',
+                'email' => 'yamada@sakura-mfg.com',
+                'phone' => '06-9876-5432',
+                'industry' => '製造業',
+                'temperature_rating' => 'B',
+                'area' => '関西',
+                'status' => '会話のみ',
+                'priority' => 4,
+                'memo' => '中規模製造業。業務効率化システムを検討中。',
+            ],
+            [
+                'user_id' => 2,
+                'company_name' => '東京総合病院',
+                'contact_name' => '佐藤健一',
+                'email' => 'sato@tokyo-hospital.jp',
+                'phone' => '03-5555-1111',
+                'industry' => '医療・福祉',
+                'temperature_rating' => 'A',
+                'area' => '関東',
+                'status' => '見込みあり',
+                'priority' => 5,
+                'memo' => '電子カルテシステムの更新を検討。予算規模大きい。',
+            ],
+            [
+                'user_id' => 2,
+                'company_name' => '株式会社グリーンフーズ',
+                'contact_name' => '鈴木美穂',
+                'email' => 'suzuki@greenfoods.co.jp',
+                'phone' => '052-3333-4444',
+                'industry' => '飲食・宿泊',
+                'temperature_rating' => 'C',
+                'area' => '中部',
+                'status' => '競合サービス利用中',
+                'priority' => 3,
+                'memo' => 'レストランチェーン。POSシステムに関心あり。',
+            ],
+            [
+                'user_id' => 2,
+                'company_name' => '北海道運輸株式会社',
+                'contact_name' => '高橋誠',
+                'email' => 'takahashi@hokkaido-transport.com',
+                'phone' => '011-2222-3333',
+                'industry' => '運輸・物流',
+                'temperature_rating' => 'B',
+                'area' => '北海道',
+                'status' => '過去取引あり',
+                'priority' => 4,
+                'memo' => '物流管理システムの導入を検討中。来月決定予定。',
+            ],
+            [
+                'user_id' => 2,
+                'company_name' => 'みらい教育学院',
+                'contact_name' => '伊藤真理子',
+                'email' => 'ito@mirai-edu.ac.jp',
+                'phone' => '092-7777-8888',
+                'industry' => '教育',
+                'temperature_rating' => 'A',
+                'area' => '九州',
+                'status' => '取引中',
+                'priority' => 5,
+                'memo' => 'オンライン学習プラットフォーム導入済み。追加機能の商談あり。',
+            ],
+            [
+                'user_id' => 2,
+                'company_name' => '山田建設工業',
+                'contact_name' => '中村大輔',
+                'email' => 'nakamura@yamada-kensetsu.jp',
+                'phone' => '022-4444-5555',
+                'industry' => '建設・不動産',
+                'temperature_rating' => 'D',
+                'area' => '東北',
+                'status' => '受けブロ',
+                'priority' => 2,
+                'memo' => '建設業界向けERPに関心。予算検討段階。',
+            ],
+            [
+                'user_id' => 2,
+                'company_name' => '西日本金融サービス',
+                'contact_name' => '小林恵子',
+                'email' => 'kobayashi@west-finance.com',
+                'phone' => '082-9999-0000',
+                'industry' => '金融業',
+                'temperature_rating' => 'B',
+                'area' => '中国',
+                'status' => '会話のみ',
+                'priority' => 4,
+                'memo' => 'フィンテック関連のソリューションを探している。',
+            ],
+            [
+                'user_id' => 2,
+                'company_name' => '四国小売チェーン',
+                'contact_name' => '渡辺浩司',
+                'email' => 'watanabe@shikoku-retail.co.jp',
+                'phone' => '087-1111-2222',
+                'industry' => '小売業',
+                'temperature_rating' => 'C',
+                'area' => '四国',
+                'status' => '競合サービス利用中',
+                'priority' => 3,
+                'memo' => '在庫管理システムのリプレイスを検討。',
+            ],
+            [
+                'user_id' => 2,
+                'company_name' => 'タナカ法律事務所',
+                'contact_name' => '田中弁護士',
+                'email' => 'info@tanaka-law.jp',
+                'phone' => '03-8888-9999',
+                'industry' => '士業・コンサル',
+                'temperature_rating' => 'E',
+                'area' => '関東',
+                'status' => '受けブロ',
+                'priority' => 1,
+                'memo' => '事務所管理ソフトに興味あるが、規模が小さい。',
+            ],
+            [
+                'user_id' => 2,
+                'company_name' => '株式会社ライトニング',
+                'contact_name' => '木村拓也',
+                'email' => 'kimura@lightning.co.jp',
+                'phone' => '03-6666-7777',
+                'industry' => 'IT',
+                'temperature_rating' => 'F',
+                'area' => '関東',
+                'status' => '架電禁止',
+                'priority' => 1,
+                'memo' => 'DM送信のみ許可。電話は一切禁止との申し出あり。',
+            ],
+            [
+                'user_id' => 2,
+                'company_name' => '関西物産株式会社',
+                'contact_name' => '森田康子',
+                'email' => 'morita@kansai-bussan.com',
+                'phone' => '06-8888-9999',
+                'industry' => '小売業',
+                'temperature_rating' => 'E',
+                'area' => '関西',
+                'status' => '架電禁止',
+                'priority' => 1,
+                'memo' => '過去にクレームあり。営業電話は禁止。メールのみ対応可。',
+            ],
+            [
+                'user_id' => 2,
+                'company_name' => 'メディカルケア診療所',
+                'contact_name' => '岡田医師',
+                'email' => 'okada@medical-care.jp',
+                'phone' => '045-1111-2222',
+                'industry' => '医療・福祉',
+                'temperature_rating' => 'D',
+                'area' => '関東',
+                'status' => '架電禁止',
+                'priority' => 2,
+                'memo' => '診療時間中の電話は禁止。平日19時以降のみメール対応。',
+            ],
+        ];
+
+        foreach ($customers as $customer) {
+            Customer::create($customer);
+        }
+    }
+}

@@ -112,4 +112,87 @@ class Customer extends Model
     {
         return $query->where('status', $status);
     }
+
+    /**
+     * 会社名・担当者名での統合検索スコープ
+     *
+     * @param  Builder  $query  クエリビルダー
+     * @param  string|null  $search  検索キーワード
+     * @return Builder 絞り込み済みのクエリビルダー
+     */
+    public function scopeSearch(Builder $query, ?string $search): Builder
+    {
+        if (empty($search)) {
+            return $query;
+        }
+
+        return $query->where(function($q) use ($search) {
+            $q->where('company_name', 'like', "%{$search}%")
+              ->orWhere('contact_name', 'like', "%{$search}%");
+        });
+    }
+
+    /**
+     * 複数ステータスでフィルタするスコープ
+     *
+     * @param  Builder  $query  クエリビルダー
+     * @param  array  $statuses  ステータス配列
+     * @return Builder 絞り込み済みのクエリビルダー
+     */
+    public function scopeFilterByStatuses(Builder $query, array $statuses): Builder
+    {
+        if (empty($statuses)) {
+            return $query;
+        }
+
+        return $query->whereIn('status', $statuses);
+    }
+
+    /**
+     * 複数温度感でフィルタするスコープ
+     *
+     * @param  Builder  $query  クエリビルダー
+     * @param  array  $temperatures  温度感配列
+     * @return Builder 絞り込み済みのクエリビルダー
+     */
+    public function scopeFilterByTemperatures(Builder $query, array $temperatures): Builder
+    {
+        if (empty($temperatures)) {
+            return $query;
+        }
+
+        return $query->whereIn('temperature_rating', $temperatures);
+    }
+
+    /**
+     * 複数業界でフィルタするスコープ
+     *
+     * @param  Builder  $query  クエリビルダー
+     * @param  array  $industries  業界配列
+     * @return Builder 絞り込み済みのクエリビルダー
+     */
+    public function scopeFilterByIndustries(Builder $query, array $industries): Builder
+    {
+        if (empty($industries)) {
+            return $query;
+        }
+
+        return $query->whereIn('industry', $industries);
+    }
+
+    /**
+     * 複数エリアでフィルタするスコープ
+     *
+     * @param  Builder  $query  クエリビルダー
+     * @param  array  $areas  エリア配列
+     * @return Builder 絞り込み済みのクエリビルダー
+     */
+    public function scopeFilterByAreas(Builder $query, array $areas): Builder
+    {
+        if (empty($areas)) {
+            return $query;
+        }
+
+        return $query->whereIn('area', $areas);
+    }
 }
