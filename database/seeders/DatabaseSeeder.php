@@ -19,5 +19,16 @@ class DatabaseSeeder extends Seeder
             'name' => 'Test User',
             'email' => 'test@example.com',
         ]);
+
+        // user_id = 2のユーザーを作成
+        User::factory()->create([
+            'name' => '営業太郎',
+            'email' => 'sales@example.com',
+        ]);
+
+        $this->call([
+            CustomerSeeder::class,
+            CallLogSeeder::class,
+        ]);
     }
 }

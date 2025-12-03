@@ -67,7 +67,7 @@ class CustomerTest extends TestCase
             'industry' => 'IT',
             'temperature_rating' => 'A',
             'area' => '東京',
-            'status' => 'new',
+            'status' => '見込みあり',
             'priority' => 3,
             'memo' => 'テストメモ',
         ];

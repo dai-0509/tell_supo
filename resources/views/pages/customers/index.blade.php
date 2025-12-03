@@ -239,12 +239,12 @@
                                 <td class="table-body">
                                     @if($customer->temperature_rating)
                                         <span class="badge
-                                            @if($customer->temperature_rating === 'A') badge-danger
-                                            @elseif($customer->temperature_rating === 'B') bg-red-100 text-red-800
-                                            @elseif($customer->temperature_rating === 'C') bg-orange-100 text-orange-800
-                                            @elseif($customer->temperature_rating === 'D') bg-yellow-100 text-yellow-800
-                                            @elseif($customer->temperature_rating === 'E') bg-green-100 text-green-800
-                                            @elseif($customer->temperature_rating === 'F') badge-secondary
+                                            @if($customer->temperature_rating === 'A') bg-red-500 text-white
+                                            @elseif($customer->temperature_rating === 'B') bg-orange-500 text-white
+                                            @elseif($customer->temperature_rating === 'C') bg-yellow-500 text-black
+                                            @elseif($customer->temperature_rating === 'D') bg-blue-500 text-white
+                                            @elseif($customer->temperature_rating === 'E') bg-purple-500 text-white
+                                            @elseif($customer->temperature_rating === 'F') bg-gray-500 text-white
                                             @else badge-secondary @endif">
                                             {{ $customer->temperature_rating }}
                                         </span>
@@ -310,11 +310,16 @@
                 </table>
 
                 <!-- ページネーション -->
-                @if($customers->hasPages())
-                    <div class="pagination-container">
-                        {{ $customers->links('pagination::tailwind') }}
+                <div class="pagination-container bg-white border-t border-gray-200 px-6 py-4">
+                    <div class="flex items-center justify-between">
+                        <div class="pagination-info text-sm text-gray-700">
+                            {{ $customers->firstItem() ?? 0 }}〜{{ $customers->lastItem() ?? 0 }}件 / 全{{ $customers->total() }}件
+                        </div>
+                        <div class="pagination-controls">
+                            {{ $customers->links('pagination::tailwind') }}
+                        </div>
                     </div>
-                @endif
+                </div>
             </div>
         @else
             <!-- 空状態 -->

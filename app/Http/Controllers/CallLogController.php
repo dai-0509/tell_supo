@@ -9,6 +9,7 @@ use App\Models\Customer;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 /**
@@ -30,14 +31,50 @@ class CallLogController extends Controller
     /**
      * 架電記録一覧画面を表示する
      *
+     * @param  Request  $request  検索・フィルタパラメータを含むリクエスト
      * @return View 架電記録一覧ページ
      */
-    public function index(): View
+    public function index(Request $request): View
     {
-        $callLogs = CallLog::forUser(auth()->id())
+        // バリデーション
+        $request->validate([
+            'search' => 'nullable|string|max:255',
+            'date_filter' => 'nullable|in:today,yesterday,this_week,this_month',
+            'results' => 'nullable|array',
+            'results.*' => 'in:通話成功,受けブロ,会話のみ,見込みあり',
+        ]);
+
+        // クエリパラメータ取得
+        $search = $request->get('search');
+        $dateFilter = $request->get('date_filter');
+        $results = $request->get('results', []);
+
+        // 架電記録データ取得（スコープチェーン適用）
+        $query = CallLog::forUser(auth()->id())
             ->with(['customer'])
-            ->latest('started_at')
-            ->paginate(20);
+            ->search($search)
+            ->filterByResults($results);
+
+        // 日付フィルター適用
+        switch ($dateFilter) {
+            case 'today':
+                $query->today();
+                break;
+            case 'yesterday':
+                $query->yesterday();
+                break;
+            case 'this_week':
+                $query->thisWeek();
+                break;
+            case 'this_month':
+                $query->thisMonth();
+                break;
+        }
+
+        $callLogs = $query->latest('started_at')->paginate(20);
+
+        // URLクエリパラメータを維持
+        $callLogs->appends($request->query());
 
         return view('pages.call-logs.index', compact('callLogs'));
     }
