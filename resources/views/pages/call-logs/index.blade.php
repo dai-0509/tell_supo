@@ -41,70 +41,86 @@
             </nav>
         </div>
 
-        <!-- フィルターバー -->
-        <div class="filter-bar bg-gray-50 border-b border-gray-200 px-6 py-3">
-            <div class="flex items-center justify-between">
-                <div class="filter-items flex items-center gap-3">
-                    <div class="filter-group flex items-center gap-1">
-                        <label class="text-sm text-gray-600 font-medium whitespace-nowrap">結果:</label>
-                        <select class="form-select text-sm w-28 pl-2 pr-6 py-1.5">
-                            <option>すべて</option>
-                            <option>接続済み</option>
-                            <option>応答なし</option>
-                            <option>話中</option>
-                            <option>失敗</option>
-                            <option>留守番電話</option>
-                        </select>
+        <!-- フィルター機能 -->
+        <form id="filterForm" method="GET" action="{{ route('call-logs.index') }}">
+            <div class="bg-gray-50 border-b border-gray-200 px-6 py-4 space-y-3">
+                <!-- 検索バー -->
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <div class="relative w-80">
+                            <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                            <input type="text" 
+                                   placeholder="顧客名、メモで検索..." 
+                                   class="form-input pl-10 text-sm"
+                                   name="search"
+                                   value="{{ request('search') }}"
+                                   onchange="document.getElementById('filterForm').submit()">
+                        </div>
                     </div>
-                    <div class="filter-group flex items-center gap-1">
-                        <label class="text-sm text-gray-600 font-medium whitespace-nowrap">期間:</label>
-                        <select class="form-select text-sm w-32 pl-2 pr-6 py-1.5">
-                            <option>すべて</option>
-                            <option>今日</option>
-                            <option>今週</option>
-                            <option>今月</option>
-                            <option>カスタム期間</option>
-                        </select>
+                    <!-- リセットボタン -->
+                    <div>
+                        <a href="{{ route('call-logs.index') }}" class="text-gray-500 text-sm hover:text-gray-700 px-3 py-1.5 rounded hover:bg-gray-200 transition-colors">
+                            <i class="fas fa-redo mr-1"></i>リセット
+                        </a>
                     </div>
-                    <div class="filter-group flex items-center gap-1">
-                        <label class="text-sm text-gray-600 font-medium whitespace-nowrap">顧客:</label>
-                        <select class="form-select text-sm w-24 pl-2 pr-6 py-1.5">
-                            <option>すべて</option>
-                        </select>
-                    </div>
-                    <button class="text-gray-500 text-sm hover:text-gray-700 px-2 py-1.5 rounded hover:bg-gray-200 transition-colors whitespace-nowrap">
-                        <i class="fas fa-filter mr-1"></i>その他
-                    </button>
                 </div>
-                <div class="filter-actions">
-                    <button class="text-gray-500 text-sm hover:text-gray-700 px-3 py-1.5 rounded hover:bg-gray-200 transition-colors whitespace-nowrap">
-                        <i class="fas fa-redo mr-1"></i>リセット
-                    </button>
-                </div>
-            </div>
-        </div>
 
-        <!-- 検索・アクションバー -->
-        <div class="search-bar bg-white border-b border-gray-200 px-6 py-4">
-            <div class="flex items-center justify-between">
-                <div class="search-container relative w-80">
-                    <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                    <input type="text"
-                           placeholder="顧客名、メモで検索..."
-                           class="form-input pl-10 text-sm"
-                           name="search"
-                           value="{{ request('search') }}">
+                <!-- 日付フィルター -->
+                <div class="flex items-center gap-2">
+                    <label class="text-sm text-gray-600 font-medium whitespace-nowrap w-16">期間:</label>
+                    <div class="flex gap-1 flex-wrap">
+                        @php
+                            $dateFilters = [
+                                '' => 'すべて',
+                                'today' => '今日',
+                                'yesterday' => '昨日',
+                                'this_week' => '今週',
+                                'this_month' => '今月'
+                            ];
+                            $selectedDate = request('date_filter', '');
+                        @endphp
+                        @foreach($dateFilters as $value => $label)
+                        <label class="filter-checkbox-label flex items-center space-x-1 bg-white border rounded px-2 py-1 hover:bg-gray-50 cursor-pointer text-xs {{ $selectedDate === $value ? 'bg-blue-50 border-blue-300' : '' }}">
+                            <input type="radio" 
+                                   name="date_filter" 
+                                   value="{{ $value }}"
+                                   class="form-radio rounded text-blue-600 w-3 h-3"
+                                   {{ $selectedDate === $value ? 'checked' : '' }}
+                                   onchange="document.getElementById('filterForm').submit()">
+                            <span class="text-gray-700">{{ $label }}</span>
+                        </label>
+                        @endforeach
+                    </div>
                 </div>
-                <div class="table-actions flex items-center gap-3">
-                    <button class="text-gray-500 hover:text-gray-700" title="並び替え">
-                        <i class="fas fa-sort"></i>
-                    </button>
-                    <button class="text-gray-500 hover:text-gray-700" title="表示設定">
-                        <i class="fas fa-cog"></i>
-                    </button>
+
+                <!-- 結果フィルター -->
+                <div class="flex items-center gap-2">
+                    <label class="text-sm text-gray-600 font-medium whitespace-nowrap w-16">結果:</label>
+                    @php
+                        $results = [
+                            '通話成功' => '通話成功',
+                            '受けブロ' => '受けブロ',
+                            '会話のみ' => '会話のみ',
+                            '見込みあり' => '見込みあり'
+                        ];
+                        $selectedResults = request('results', []);
+                    @endphp
+                    <div class="flex gap-1 flex-wrap">
+                        @foreach($results as $value => $label)
+                        <label class="filter-checkbox-label flex items-center space-x-1 bg-white border rounded px-2 py-1 hover:bg-gray-50 cursor-pointer text-xs {{ in_array($value, $selectedResults) ? 'bg-green-50 border-green-300' : '' }}">
+                            <input type="checkbox" 
+                                   name="results[]" 
+                                   value="{{ $value }}"
+                                   class="form-checkbox rounded text-green-600 w-3 h-3"
+                                   {{ in_array($value, $selectedResults) ? 'checked' : '' }}
+                                   onchange="document.getElementById('filterForm').submit()">
+                            <span class="text-gray-700">{{ $label }}</span>
+                        </label>
+                        @endforeach
+                    </div>
                 </div>
             </div>
-        </div>
+        </form>
 
         <!-- データテーブル -->
         @if($callLogs->count() > 0)
@@ -178,11 +194,10 @@
                                 </td>
                                 <td class="table-body">
                                     <span class="badge
-                                        @if($callLog->result === 'connected') badge-success
-                                        @elseif($callLog->result === 'no_answer') badge-warning
-                                        @elseif($callLog->result === 'busy') bg-orange-100 text-orange-800
-                                        @elseif($callLog->result === 'failed') badge-danger
-                                        @elseif($callLog->result === 'voicemail') badge-info
+                                        @if($callLog->result === '通話成功') bg-green-100 text-green-800
+                                        @elseif($callLog->result === '受けブロ') bg-red-100 text-red-800
+                                        @elseif($callLog->result === '会話のみ') bg-blue-100 text-blue-800
+                                        @elseif($callLog->result === '見込みあり') bg-yellow-100 text-yellow-800
                                         @else badge-secondary @endif">
                                         {{ $callLog->result_label }}
                                     </span>
@@ -242,18 +257,36 @@
             </div>
         @else
             <!-- 空状態 -->
-            <div class="empty-state">
-                <div class="empty-state-icon">
-                    <i class="fas fa-phone"></i>
+            @php
+                $hasFilters = request()->hasAny(['search', 'date_filter', 'results']);
+            @endphp
+            @if($hasFilters)
+                <div class="empty-state">
+                    <div class="empty-state-icon">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <h3 class="empty-state-title">条件に一致する架電記録が見つかりません</h3>
+                    <p class="empty-state-description">
+                        検索条件やフィルターを変更してお試しください
+                    </p>
+                    <a href="{{ route('call-logs.index') }}" class="btn-secondary">
+                        <i class="fas fa-redo mr-2"></i>フィルタをリセット
+                    </a>
                 </div>
-                <h3 class="empty-state-title">架電記録がまだ登録されていません</h3>
-                <p class="empty-state-description">
-                    最初の架電記録を追加して、架電履歴を管理しましょう
-                </p>
-                <button id="create-call-log-btn-2" class="btn-primary">
-                    <i class="fas fa-plus mr-2"></i>架電記録を作成
-                </button>
-            </div>
+            @else
+                <div class="empty-state">
+                    <div class="empty-state-icon">
+                        <i class="fas fa-phone"></i>
+                    </div>
+                    <h3 class="empty-state-title">架電記録がまだ登録されていません</h3>
+                    <p class="empty-state-description">
+                        最初の架電記録を追加して、架電履歴を管理しましょう
+                    </p>
+                    <button id="create-call-log-btn-2" class="btn-primary">
+                        <i class="fas fa-plus mr-2"></i>架電記録を作成
+                    </button>
+                </div>
+            @endif
         @endif
     </div>
 
@@ -262,6 +295,15 @@
 </x-app-layout>
 
 <style>
+/* カスタムスタイル */
+.call-logs-index-page {
+    @apply min-h-screen bg-gray-50;
+}
+
+.page-header {
+    @apply bg-white border-b border-gray-200;
+}
+
 /* タブナビゲーション */
 .tab-item {
     @apply px-4 py-3 text-sm font-medium text-gray-500 border-b-2 border-transparent hover:text-gray-700 hover:border-gray-300 transition-all duration-200;
@@ -271,12 +313,100 @@
     @apply text-green-600 border-green-500;
 }
 
-/* アクションメニュー */
+.table-container {
+    @apply bg-white;
+}
+
+.table-header {
+    @apply bg-gray-50 border-b border-gray-200;
+}
+
+.table-header th {
+    @apply px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider;
+}
+
+.table-body {
+    @apply px-6 py-4;
+}
+
+.badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+}
+
+.badge-danger {
+    @apply bg-red-100 text-red-800;
+}
+
+.badge-warning {
+    @apply bg-yellow-100 text-yellow-800;
+}
+
+.badge-success {
+    @apply bg-green-100 text-green-800;
+}
+
+.badge-info {
+    @apply bg-blue-100 text-blue-800;
+}
+
+.badge-secondary {
+    @apply bg-gray-100 text-gray-800;
+}
+
+.empty-state {
+    @apply text-center py-12 px-6;
+}
+
+.empty-state-icon {
+    @apply mx-auto w-12 h-12 text-gray-400 text-4xl mb-4;
+}
+
+.empty-state-title {
+    @apply text-lg font-medium text-gray-900 mb-2;
+}
+
+.empty-state-description {
+    @apply text-gray-500 mb-6 max-w-md mx-auto;
+}
+
+.btn-primary {
+    @apply bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center;
+}
+
+.btn-secondary {
+    @apply bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center;
+}
+
+.form-input {
+    @apply block w-full rounded-lg border border-gray-300 px-3 py-2 placeholder-gray-400 focus:border-green-500 focus:ring-green-500 sm:text-sm;
+}
+
+.form-select {
+    @apply block rounded-lg border border-gray-300 px-3 py-2 focus:border-green-500 focus:ring-green-500 sm:text-sm;
+}
+
+.form-checkbox {
+    @apply h-4 w-4 rounded border-gray-300 focus:ring-green-500 focus:ring-2;
+}
+
+.form-radio {
+    @apply h-4 w-4 border-gray-300 focus:ring-green-500 focus:ring-2;
+}
+
 .action-menu {
+    @apply absolute right-0 top-8 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-10;
     min-width: 140px;
 }
 
-/* 検索入力フィールド */
+.action-menu-item {
+    @apply block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors;
+}
+
+.pagination-container {
+    @apply px-6 py-4 border-t border-gray-200;
+}
+
+/* フォーカス時のスタイル */
 .search-container input:focus {
     @apply ring-2 ring-green-500 border-green-500;
 }

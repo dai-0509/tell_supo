@@ -26,7 +26,7 @@ class CustomerFactory extends Factory
             'industry' => $this->faker->randomElement(['IT', '製造業', '小売業', '金融業', '医療・福祉', '教育', '建設・不動産', '運輸・物流', '飲食・宿泊', '士業・コンサル', 'その他']),
             'temperature_rating' => $this->faker->randomElement(['A', 'B', 'C', 'D', 'E', 'F']),
             'area' => $this->faker->randomElement(['東京', '大阪', '名古屋', '福岡', '札幌', '仙台', '広島']),
-            'status' => $this->faker->randomElement(['new', 'contacted', 'qualified', 'proposal', 'negotiation', 'closed', 'lost']),
+            'status' => $this->faker->randomElement(['受けブロ', '会話のみ', '見込みあり', '競合サービス利用中', '過去取引あり', '取引中', '架電禁止']),
             'priority' => $this->faker->numberBetween(1, 5),
             'memo' => $this->faker->optional()->realText(200),
         ];

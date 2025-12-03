@@ -24,22 +24,22 @@ class CallLogFactory extends Factory
             'customer_id' => Customer::factory(),
             'started_at' => $startedAt,
             'ended_at' => $endedAt,
-            'result' => fake()->randomElement(['connected', 'no_answer', 'busy', 'failed', 'voicemail']),
+            'result' => fake()->randomElement(['通話成功', '受けブロ', '会話のみ', '見込みあり']),
             'notes' => fake()->optional(0.7)->realText(200),
         ];
     }
 
-    public function connected(): static
+    public function successful(): static
     {
         return $this->state(fn (array $attributes) => [
-            'result' => 'connected',
+            'result' => '通話成功',
         ]);
     }
 
-    public function noAnswer(): static
+    public function blocked(): static
     {
         return $this->state(fn (array $attributes) => [
-            'result' => 'no_answer',
+            'result' => '受けブロ',
             'ended_at' => null,
         ]);
     }

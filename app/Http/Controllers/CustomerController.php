@@ -8,6 +8,7 @@ use App\Models\Customer;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 /**
@@ -29,13 +30,47 @@ class CustomerController extends Controller
     /**
      * 顧客一覧画面を表示する
      *
+     * @param  Request  $request  検索・フィルタパラメータを含むリクエスト
      * @return View 顧客一覧ページ
      */
-    public function index(): View
+    public function index(Request $request): View
     {
+        // バリデーション
+        $request->validate([
+            'search' => 'nullable|string|max:255',
+            'statuses' => 'nullable|array',
+            'statuses.*' => 'in:受けブロ,会話のみ,見込みあり,競合サービス利用中,過去取引あり,取引中,架電禁止',
+            'temperatures' => 'nullable|array', 
+            'temperatures.*' => 'in:A,B,C,D,E,F',
+            'industries' => 'nullable|array',
+            'industries.*' => 'in:IT,製造業,小売業,金融業,医療・福祉,教育,建設・不動産,運輸・物流,飲食・宿泊,士業・コンサル,その他',
+            'areas' => 'nullable|array',
+            'areas.*' => 'string|max:50',
+            'sort' => 'nullable|in:created_at,updated_at',
+            'direction' => 'nullable|in:asc,desc',
+        ]);
+
+        // クエリパラメータ取得
+        $search = $request->get('search');
+        $statuses = $request->get('statuses', []);
+        $temperatures = $request->get('temperatures', []);
+        $industries = $request->get('industries', []);
+        $areas = $request->get('areas', []);
+        $sortBy = $request->get('sort', 'created_at');
+        $direction = $request->get('direction', 'desc');
+
+        // 顧客データ取得（スコープチェーン適用）
         $customers = Customer::forUser(auth()->id())
-            ->latest()
+            ->search($search)
+            ->filterByStatuses($statuses)
+            ->filterByTemperatures($temperatures)
+            ->filterByIndustries($industries)
+            ->filterByAreas($areas)
+            ->orderBy($sortBy, $direction)
             ->paginate(20);
+
+        // URLクエリパラメータを維持
+        $customers->appends($request->query());
 
         return view('pages.customers.index', compact('customers'));
     }

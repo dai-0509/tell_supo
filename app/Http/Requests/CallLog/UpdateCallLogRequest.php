@@ -38,7 +38,7 @@ class UpdateCallLogRequest extends FormRequest
             ],
             'started_at' => ['required', 'date', 'before_or_equal:now'],
             'ended_at' => ['nullable', 'date', 'after:started_at'],
-            'result' => ['required', Rule::in(['connected', 'no_answer', 'busy', 'failed', 'voicemail'])],
+            'result' => ['required', Rule::in(['通話成功', '受けブロ', '会話のみ', '見込みあり'])],
             'notes' => ['nullable', 'string', 'max:1000'],
         ];
     }

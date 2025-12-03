@@ -105,6 +105,17 @@ class CallLog extends Model
     }
 
     /**
+     * 昨日の架電記録のみを取得するクエリスコープ
+     *
+     * @param  Builder<CallLog>  $query  Eloquentクエリビルダー
+     * @return Builder<CallLog> フィルタリングされたクエリビルダー
+     */
+    public function scopeYesterday(Builder $query): Builder
+    {
+        return $query->whereDate('started_at', Carbon::yesterday());
+    }
+
+    /**
      * 今週の架電記録のみを取得するクエリスコープ
      *
      * @param  Builder<CallLog>  $query  Eloquentクエリビルダー
@@ -116,6 +127,57 @@ class CallLog extends Model
             Carbon::now()->startOfWeek(),
             Carbon::now()->endOfWeek(),
         ]);
+    }
+
+    /**
+     * 今月の架電記録のみを取得するクエリスコープ
+     *
+     * @param  Builder<CallLog>  $query  Eloquentクエリビルダー
+     * @return Builder<CallLog> フィルタリングされたクエリビルダー
+     */
+    public function scopeThisMonth(Builder $query): Builder
+    {
+        return $query->whereBetween('started_at', [
+            Carbon::now()->startOfMonth(),
+            Carbon::now()->endOfMonth(),
+        ]);
+    }
+
+    /**
+     * 複数の通話結果で絞り込むクエリスコープ
+     *
+     * @param  Builder<CallLog>  $query  Eloquentクエリビルダー
+     * @param  array<string>  $results  フィルタリング対象の通話結果配列
+     * @return Builder<CallLog> フィルタリングされたクエリビルダー
+     */
+    public function scopeFilterByResults(Builder $query, array $results): Builder
+    {
+        if (empty($results)) {
+            return $query;
+        }
+        return $query->whereIn('result', $results);
+    }
+
+    /**
+     * 顧客名・メモでの検索を行うクエリスコープ
+     *
+     * @param  Builder<CallLog>  $query  Eloquentクエリビルダー
+     * @param  string|null  $search  検索文字列
+     * @return Builder<CallLog> 検索条件が適用されたクエリビルダー
+     */
+    public function scopeSearch(Builder $query, ?string $search): Builder
+    {
+        if (empty($search)) {
+            return $query;
+        }
+
+        return $query->where(function ($query) use ($search) {
+            $query->where('notes', 'like', "%{$search}%")
+                ->orWhereHas('customer', function ($customerQuery) use ($search) {
+                    $customerQuery->where('company_name', 'like', "%{$search}%")
+                        ->orWhere('contact_name', 'like', "%{$search}%");
+                });
+        });
     }
 
     /**
@@ -144,11 +206,10 @@ class CallLog extends Model
     public function getResultLabelAttribute(): string
     {
         return match ($this->result) {
-            'connected' => '接続済',
-            'no_answer' => '応答なし',
-            'busy' => '話中',
-            'failed' => '失敗',
-            'voicemail' => '留守電',
+            '通話成功' => '通話成功',
+            '受けブロ' => '受けブロ',
+            '会話のみ' => '会話のみ',
+            '見込みあり' => '見込みあり',
             default => '不明',
         };
     }
@@ -161,11 +222,10 @@ class CallLog extends Model
     public static function getResultOptions(): array
     {
         return [
-            'connected' => '接続済',
-            'no_answer' => '応答なし',
-            'busy' => '話中',
-            'failed' => '失敗',
-            'voicemail' => '留守電',
+            '通話成功' => '通話成功',
+            '受けブロ' => '受けブロ',
+            '会話のみ' => '会話のみ',
+            '見込みあり' => '見込みあり',
         ];
     }
 }
