@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\CallLogController;
 use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\KpiTargetController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -22,9 +23,14 @@ Route::middleware('auth')->group(function () {
 Route::middleware(['auth'])->group(function () {
     Route::resource('customers', CustomerController::class);
     Route::resource('call-logs', CallLogController::class);
-    Route::view('/calls', 'pages.calls.index')->name('calls.index');
-    Route::view('/kpis', 'pages.kpis.index')->name('kpis.index');
-    
+
+    // KPI管理
+    Route::resource('kpi-targets', KpiTargetController::class)->parameters(['kpi-targets' => 'kpiTarget']);
+    Route::post('kpi-targets/reset', [KpiTargetController::class, 'reset'])->name('kpi-targets.reset');
+
+    // 既存ページ（TODO: F007実装時にダッシュボードページに置き換え予定）
+    Route::view('/calls', 'pages.call-logs.index')->name('calls.index');
+
     // API endpoints for React components
     Route::get('/api/customers', [CustomerController::class, 'apiIndex'])->name('api.customers.index');
 });

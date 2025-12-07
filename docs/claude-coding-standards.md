@@ -16,6 +16,15 @@
 - **インデックス必須** - 検索カラムは全てインデックス
 - **ページネーション** - 一覧は必ずpaginate()
 
+### データベース設計
+- **IDカラム命名**: `{テーブル名}_id` 形式で可読性を確保
+  - 例: `customer_id`, `call_log_id`, `kpi_target_id`
+  - 理由: JOIN時やログでどのテーブルのIDか即座に判別可能
+- **外部キー命名**: 参照先テーブル名を含める
+  - 例: `user_id`, `customer_id` (users.id, customers.idを参照)
+- **複合ユニークキー**: 意味のある名前を付ける
+  - 例: `unique_user_active_target` (user_id + is_active + effective_from)
+
 ## 📁 ディレクトリ構成
 
 ```
