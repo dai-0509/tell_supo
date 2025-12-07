@@ -13,7 +13,7 @@
         <ul class="list-none">
             <!-- ダッシュボード -->
             <li>
-                <a href="{{ route('dashboard') }}" 
+                <a href="{{ route('dashboard') }}"
                    class="flex items-center px-5 py-3 text-gray-300 text-sm hover:bg-slate-700 hover:text-white transition-all duration-200 gap-3 font-medium border-l-3 {{ request()->routeIs('dashboard') ? 'bg-slate-700 text-white border-blue-400' : 'border-transparent' }}">
                     <i class="fas fa-tachometer-alt w-5 text-center"></i>
                     <span>ダッシュボード</span>
@@ -22,7 +22,7 @@
 
             <!-- 顧客管理 -->
             <li>
-                <a href="{{ route('customers.index') }}" 
+                <a href="{{ route('customers.index') }}"
                    class="flex items-center px-5 py-3 text-gray-300 text-sm hover:bg-slate-700 hover:text-white transition-all duration-200 gap-3 font-medium border-l-3 {{ request()->routeIs('customers.*') ? 'bg-slate-700 text-white border-blue-400' : 'border-transparent' }}">
                     <i class="fas fa-users w-5 text-center"></i>
                     <span>顧客管理</span>
@@ -31,7 +31,7 @@
 
             <!-- 架電記録 -->
             <li>
-                <a href="{{ route('call-logs.index') }}" 
+                <a href="{{ route('call-logs.index') }}"
                    class="flex items-center px-5 py-3 text-gray-300 text-sm hover:bg-slate-700 hover:text-white transition-all duration-200 gap-3 font-medium border-l-3 {{ request()->routeIs('call-logs.*') ? 'bg-slate-700 text-white border-blue-400' : 'border-transparent' }}">
                     <i class="fas fa-phone w-5 text-center"></i>
                     <span>架電記録</span>
@@ -40,7 +40,7 @@
 
             <!-- KPI管理 -->
             <li>
-                <a href="{{ route('kpis.index') }}" 
+                <a href="{{ route('kpi-targets.index') }}"
                    class="flex items-center px-5 py-3 text-gray-300 text-sm hover:bg-slate-700 hover:text-white transition-all duration-200 gap-3 font-medium border-l-3 {{ request()->routeIs('kpis.*') ? 'bg-slate-700 text-white border-blue-400' : 'border-transparent' }}">
                     <i class="fas fa-chart-line w-5 text-center"></i>
                     <span>KPI管理</span>
@@ -54,7 +54,7 @@
         <!-- 設定・その他 -->
         <ul class="list-none">
             <li>
-                <a href="#" 
+                <a href="#"
                    class="flex items-center px-5 py-3 text-gray-300 text-sm hover:bg-slate-700 hover:text-white transition-all duration-200 gap-3 font-medium border-l-3 border-transparent">
                     <i class="fas fa-cog w-5 text-center"></i>
                     <span>設定</span>
