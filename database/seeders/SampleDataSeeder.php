@@ -26,7 +26,7 @@ class SampleDataSeeder extends Seeder
 
         // 1. 10件の顧客データ（ページネーションなし）
         $customers = [];
-        $customerData = [
+        $customer_data = [
             ['株式会社サンプル', '田中 太郎', 'tanaka@sample.com', '03-1111-1111', 'IT', '関東', '高', '1', 'new'],
             ['合同会社テスト', '佐藤 花子', 'sato@test.com', '03-2222-2222', '製造業', '中部', '中', '2', 'contacted'],
             ['株式会社デモ', '鈴木 次郎', 'suzuki@demo.com', '03-3333-3333', 'その他', '近畿', '低', '3', 'qualified'],
@@ -39,7 +39,7 @@ class SampleDataSeeder extends Seeder
             ['ソリューション株式会社', '加藤 真理', 'kato@solution.com', '03-0000-0000', 'IT', '四国', '中', '1', 'proposal'],
         ];
 
-        foreach ($customerData as $index => $data) {
+        foreach ($customer_data as $index => $data) {
             $customers[] = Customer::create([
                 'user_id' => $user->id,
                 'company_name' => $data[0],
@@ -58,21 +58,21 @@ class SampleDataSeeder extends Seeder
         }
 
         // 2. 10件の架電記録データ
-        $callResults = ['connected', 'no_answer', 'busy', 'failed', 'voicemail'];
+        $call_results = ['connected', 'no_answer', 'busy', 'failed', 'voicemail'];
         
         foreach ($customers as $index => $customer) {
-            $startedAt = now()->subDays(rand(1, 7))->subHours(rand(9, 17));
-            $endedAt = $startedAt->copy()->addMinutes(rand(5, 45));
+            $started_at = now()->subDays(rand(1, 7))->subHours(rand(9, 17));
+            $ended_at = $started_at->copy()->addMinutes(rand(5, 45));
             
             CallLog::create([
                 'user_id' => $user->id,
                 'customer_id' => $customer->id,
-                'started_at' => $startedAt,
-                'ended_at' => $endedAt,
-                'result' => $callResults[array_rand($callResults)],
+                'started_at' => $started_at,
+                'ended_at' => $ended_at,
+                'result' => $call_results[array_rand($call_results)],
                 'notes' => "{$customer->company_name}への架電記録です。{$customer->contact_name}様と通話しました。",
-                'created_at' => $startedAt,
-                'updated_at' => $startedAt,
+                'created_at' => $started_at,
+                'updated_at' => $started_at,
             ]);
         }
 
@@ -87,12 +87,12 @@ class SampleDataSeeder extends Seeder
         $user = User::first();
         
         // 追加で20件の顧客（合計30件でページネーション表示）
-        $additionalCustomers = Customer::factory(20)->create([
+        $additional_customers = Customer::factory(20)->create([
             'user_id' => $user->id,
         ]);
 
         // 追加で20件の架電記録（合計30件でページネーション表示）
-        foreach ($additionalCustomers as $customer) {
+        foreach ($additional_customers as $customer) {
             CallLog::factory()->create([
                 'user_id' => $user->id,
                 'customer_id' => $customer->id,

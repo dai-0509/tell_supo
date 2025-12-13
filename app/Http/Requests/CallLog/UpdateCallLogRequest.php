@@ -3,6 +3,7 @@
 namespace App\Http\Requests\CallLog;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 
 /**
@@ -20,7 +21,7 @@ class UpdateCallLogRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return auth()->check();
+        return Auth::check();
     }
 
     /**
@@ -34,7 +35,7 @@ class UpdateCallLogRequest extends FormRequest
             'customer_id' => [
                 'required',
                 'integer',
-                'exists:customers,id,user_id,'.auth()->id(),
+                'exists:customers,id,user_id,'.Auth::id(),
             ],
             'started_at' => ['required', 'date', 'before_or_equal:now'],
             'ended_at' => ['nullable', 'date', 'after:started_at'],

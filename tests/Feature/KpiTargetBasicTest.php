@@ -62,12 +62,19 @@ class KpiTargetBasicTest extends TestCase
     public function test_can_create_kpi_target_with_valid_data(): void
     {
         $data = [
-            'daily_call_target' => 50,
+            'monday_call_target' => 50,
+            'tuesday_call_target' => 50,
+            'wednesday_call_target' => 50,
+            'thursday_call_target' => 50,
+            'friday_call_target' => 50,
+            'saturday_call_target' => 0,
+            'sunday_call_target' => 0,
             'weekly_call_target' => 250,
             'monthly_call_target' => 1000,
             'monthly_appointment_target' => 25,
             'target_success_rate' => 60.0,
             'target_appointment_rate' => 25.0,
+            'setting_method' => 'manual',
             'effective_from' => now()->toDateString(),
         ];
 
@@ -86,7 +93,7 @@ class KpiTargetBasicTest extends TestCase
         // データベースに保存されているか確認
         $this->assertDatabaseHas('user_kpi_targets', [
             'user_id' => $this->user->id,
-            'daily_call_target' => 50,
+            'monday_call_target' => 50,
             'weekly_call_target' => 250,
             'monthly_call_target' => 1000,
             'is_active' => true,
@@ -99,10 +106,17 @@ class KpiTargetBasicTest extends TestCase
     public function test_validation_errors_on_invalid_data(): void
     {
         $data = [
-            'daily_call_target' => 0, // 最小値エラー
-            'weekly_call_target' => 10, // 整合性エラー（日次の5倍未満）
-            'monthly_call_target' => 50, // 整合性エラー（週次の4倍未満）
+            'monday_call_target' => 0,
+            'tuesday_call_target' => 0,
+            'wednesday_call_target' => 0,
+            'thursday_call_target' => 0,
+            'friday_call_target' => 0,
+            'saturday_call_target' => 0,
+            'sunday_call_target' => 0,
+            'weekly_call_target' => 10,
+            'monthly_call_target' => 50,
             'monthly_appointment_target' => -1, // 最小値エラー
+            'setting_method' => 'manual',
         ];
 
         $response = $this->actingAs($this->user)
@@ -110,7 +124,7 @@ class KpiTargetBasicTest extends TestCase
 
         $response->assertStatus(302); // リダイレクト
         $response->assertSessionHasErrors([
-            'daily_call_target',
+            'monday_call_target',
             'monthly_appointment_target'
         ]);
     }
@@ -121,10 +135,17 @@ class KpiTargetBasicTest extends TestCase
     public function test_consistency_validation_errors(): void
     {
         $data = [
-            'daily_call_target' => 50, // 有効な値
-            'weekly_call_target' => 200, // 整合性エラー（50 * 5 = 250 未満）
-            'monthly_call_target' => 700, // 整合性エラー（200 * 4 = 800 未満）
-            'monthly_appointment_target' => 25, // 有効な値
+            'monday_call_target' => 40,
+            'tuesday_call_target' => 40,
+            'wednesday_call_target' => 40,
+            'thursday_call_target' => 40,
+            'friday_call_target' => 40,
+            'saturday_call_target' => 0,
+            'sunday_call_target' => 0,
+            'weekly_call_target' => 250, // 整合性エラー（曜日合計200 ≠ 250）
+            'monthly_call_target' => 700, // 整合性エラー（250 * 4 = 1000 未満）
+            'monthly_appointment_target' => 25,
+            'setting_method' => 'manual',
             'effective_from' => now()->toDateString(),
         ];
 
@@ -145,16 +166,28 @@ class KpiTargetBasicTest extends TestCase
     {
         // 整合性のある目標
         $consistentTarget = UserKpiTarget::make([
-            'daily_call_target' => 50,
-            'weekly_call_target' => 250, // 50 * 5
+            'monday_call_target' => 50,
+            'tuesday_call_target' => 50,
+            'wednesday_call_target' => 50,
+            'thursday_call_target' => 50,
+            'friday_call_target' => 50,
+            'saturday_call_target' => 0,
+            'sunday_call_target' => 0,
+            'weekly_call_target' => 250, // 合計250
             'monthly_call_target' => 1000, // 250 * 4
         ]);
         $this->assertTrue($consistentTarget->isConsistent());
 
         // 整合性のない目標
         $inconsistentTarget = UserKpiTarget::make([
-            'daily_call_target' => 50,
-            'weekly_call_target' => 200, // 50 * 5 = 250 未満
+            'monday_call_target' => 40,
+            'tuesday_call_target' => 40,
+            'wednesday_call_target' => 40,
+            'thursday_call_target' => 40,
+            'friday_call_target' => 40,
+            'saturday_call_target' => 0,
+            'sunday_call_target' => 0,
+            'weekly_call_target' => 250, // 合計200 ≠ 250
             'monthly_call_target' => 1000,
         ]);
         $this->assertFalse($inconsistentTarget->isConsistent());
@@ -168,20 +201,34 @@ class KpiTargetBasicTest extends TestCase
         // 既存の目標を作成
         $existingTarget = UserKpiTarget::create([
             'user_id' => $this->user->id,
-            'daily_call_target' => 30,
+            'monday_call_target' => 30,
+            'tuesday_call_target' => 30,
+            'wednesday_call_target' => 30,
+            'thursday_call_target' => 30,
+            'friday_call_target' => 30,
+            'saturday_call_target' => 0,
+            'sunday_call_target' => 0,
             'weekly_call_target' => 150,
             'monthly_call_target' => 600,
             'monthly_appointment_target' => 15,
+            'setting_method' => 'manual',
             'effective_from' => now()->toDateString(),
             'is_active' => true,
         ]);
 
         // 新しい目標を作成
         $newData = [
-            'daily_call_target' => 50,
+            'monday_call_target' => 50,
+            'tuesday_call_target' => 50,
+            'wednesday_call_target' => 50,
+            'thursday_call_target' => 50,
+            'friday_call_target' => 50,
+            'saturday_call_target' => 0,
+            'sunday_call_target' => 0,
             'weekly_call_target' => 250,
             'monthly_call_target' => 1000,
             'monthly_appointment_target' => 25,
+            'setting_method' => 'manual',
             'effective_from' => now()->toDateString(),
         ];
 
@@ -197,7 +244,7 @@ class KpiTargetBasicTest extends TestCase
         // 新しい目標がアクティブか確認
         $this->assertDatabaseHas('user_kpi_targets', [
             'user_id' => $this->user->id,
-            'daily_call_target' => 50,
+            'monday_call_target' => 50,
             'is_active' => true,
         ]);
     }

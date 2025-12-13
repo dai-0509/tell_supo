@@ -10,6 +10,7 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 
 /**
@@ -46,17 +47,17 @@ class CallLogController extends Controller
 
         // クエリパラメータ取得
         $search = $request->get('search');
-        $dateFilter = $request->get('date_filter');
+        $date_filter = $request->get('date_filter');
         $results = $request->get('results', []);
 
         // 架電記録データ取得（スコープチェーン適用）
-        $query = CallLog::forUser(auth()->id())
+        $query = CallLog::forUser(Auth::id())
             ->with(['customer'])
             ->search($search)
             ->filterByResults($results);
 
         // 日付フィルター適用
-        switch ($dateFilter) {
+        switch ($date_filter) {
             case 'today':
                 $query->today();
                 break;
@@ -86,7 +87,7 @@ class CallLogController extends Controller
      */
     public function create(): View
     {
-        $customers = Customer::forUser(auth()->id())
+        $customers = Customer::forUser(Auth::id())
             ->orderBy('company_name')
             ->get(['id', 'company_name', 'contact_name']);
 
@@ -104,7 +105,7 @@ class CallLogController extends Controller
     public function store(StoreCallLogRequest $request): RedirectResponse|JsonResponse
     {
         $validated = $request->validated();
-        $validated['user_id'] = auth()->id();
+        $validated['user_id'] = Auth::id();
 
         $callLog = CallLog::create($validated);
 
@@ -112,7 +113,7 @@ class CallLogController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => '架電記録を登録しました',
-                'callLog' => $callLog->load('customer')
+                'call_log' => $callLog->load('customer')
             ]);
         }
 
@@ -146,7 +147,7 @@ class CallLogController extends Controller
     {
         $this->authorize('update', $callLog);
 
-        $customers = Customer::forUser(auth()->id())
+        $customers = Customer::forUser(Auth::id())
             ->orderBy('company_name')
             ->get(['id', 'company_name', 'contact_name']);
 

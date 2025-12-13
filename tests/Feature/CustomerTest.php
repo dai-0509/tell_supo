@@ -35,16 +35,16 @@ class CustomerTest extends TestCase
 
     public function test_他のユーザーの顧客は表示されない(): void
     {
-        $otherUser = User::factory()->create();
-        $myCustomer = Customer::factory()->create(['user_id' => $this->user->id]);
-        $otherCustomer = Customer::factory()->create(['user_id' => $otherUser->id]);
+        $other_user = User::factory()->create();
+        $my_customer = Customer::factory()->create(['user_id' => $this->user->id]);
+        $other_customer = Customer::factory()->create(['user_id' => $other_user->id]);
 
         $response = $this->actingAs($this->user)
             ->get(route('customers.index'));
 
         $response->assertStatus(200)
-            ->assertSee($myCustomer->company_name)
-            ->assertDontSee($otherCustomer->company_name);
+            ->assertSee($my_customer->company_name)
+            ->assertDontSee($other_customer->company_name);
     }
 
     public function test_顧客登録フォームを表示できる(): void
@@ -59,7 +59,7 @@ class CustomerTest extends TestCase
 
     public function test_新規顧客を登録できる(): void
     {
-        $customerData = [
+        $customer_data = [
             'company_name' => 'テスト株式会社',
             'contact_name' => '田中太郎',
             'email' => 'test@example.com',
@@ -73,7 +73,7 @@ class CustomerTest extends TestCase
         ];
 
         $response = $this->actingAs($this->user)
-            ->post(route('customers.store'), $customerData);
+            ->post(route('customers.store'), $customer_data);
 
         $response->assertRedirect();
         $this->assertDatabaseHas('customers', [
@@ -115,9 +115,9 @@ class CustomerTest extends TestCase
 
     public function test_異なるユーザーなら同じ会社名で登録できる(): void
     {
-        $otherUser = User::factory()->create();
+        $other_user = User::factory()->create();
         Customer::factory()->create([
-            'user_id' => $otherUser->id,
+            'user_id' => $other_user->id,
             'company_name' => '同名会社',
         ]);
 
@@ -187,14 +187,14 @@ class CustomerTest extends TestCase
     {
         $customer = Customer::factory()->create(['user_id' => $this->user->id]);
 
-        $updateData = [
+        $update_data = [
             'company_name' => '更新後会社名',
             'contact_name' => '更新後担当者',
             'email' => 'updated@example.com',
         ];
 
         $response = $this->actingAs($this->user)
-            ->put(route('customers.update', $customer), $updateData);
+            ->put(route('customers.update', $customer), $update_data);
 
         $response->assertRedirect();
         $this->assertDatabaseHas('customers', [

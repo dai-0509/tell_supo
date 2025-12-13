@@ -82,12 +82,12 @@
                                            name="weekly_call_target" 
                                            value="{{ old('weekly_call_target', $kpiTarget->weekly_call_target) }}" 
                                            min="5" 
-                                           max="1400"
+                                           max="1000"
                                            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 @error('weekly_call_target') border-red-500 @enderror">
                                     @error('weekly_call_target')
                                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                                     @enderror
-                                    <p class="mt-1 text-xs text-gray-500">5～1400件（日次×5以上）</p>
+                                    <p class="mt-1 text-xs text-gray-500">5～1000件（日次×5以上）</p>
                                 </div>
                                 
                                 <div>
@@ -264,10 +264,10 @@
                 const weeklyHint = weeklyInput.parentNode.querySelector('.text-gray-500');
                 if (weeklyHint) {
                     if (daily > 0) {
-                        weeklyHint.textContent = `5～1400件（最低${weeklyMin}件推奨）`;
+                        weeklyHint.textContent = `5～1000件（最低${weeklyMin}件推奨）`;
                         weeklyHint.className = weekly >= weeklyMin ? 'mt-1 text-xs text-green-600' : 'mt-1 text-xs text-orange-600';
                     } else {
-                        weeklyHint.textContent = '5～1400件（日次×5以上）';
+                        weeklyHint.textContent = '5～1000件（日次×5以上）';
                         weeklyHint.className = 'mt-1 text-xs text-gray-500';
                     }
                 }

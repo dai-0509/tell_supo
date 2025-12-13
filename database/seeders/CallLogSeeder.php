@@ -24,27 +24,27 @@ class CallLogSeeder extends Seeder
         }
 
         $results = ['通話成功', '受けブロ', '会話のみ', '見込みあり'];
-        $callLogs = [];
+        $call_logs = [];
 
         foreach ($customers as $customer) {
             // 各顧客に対して1〜5件の架電記録を作成
-            $callCount = fake()->numberBetween(1, 5);
+            $call_count = fake()->numberBetween(1, 5);
             
-            for ($i = 0; $i < $callCount; $i++) {
-                $startedAt = fake()->dateTimeBetween('-2 months', 'now');
+            for ($i = 0; $i < $call_count; $i++) {
+                $started_at = fake()->dateTimeBetween('-2 months', 'now');
                 $result = fake()->randomElement($results);
                 
                 // 通話成功と見込みありの場合は終了時間を設定
-                $endedAt = null;
+                $ended_at = null;
                 if (in_array($result, ['通話成功', '見込みあり'])) {
-                    $endedAt = Carbon::parse($startedAt)->addMinutes(fake()->numberBetween(2, 30));
+                    $ended_at = Carbon::parse($started_at)->addMinutes(fake()->numberBetween(2, 30));
                 }
 
-                $callLogs[] = [
+                $call_logs[] = [
                     'user_id' => 2,
                     'customer_id' => $customer->id,
-                    'started_at' => $startedAt,
-                    'ended_at' => $endedAt,
+                    'started_at' => $started_at,
+                    'ended_at' => $ended_at,
                     'result' => $result,
                     'notes' => $this->generateNotes($result, $customer->company_name),
                     'created_at' => now(),
@@ -54,16 +54,16 @@ class CallLogSeeder extends Seeder
         }
 
         // バッチ挿入
-        CallLog::insert($callLogs);
+        CallLog::insert($call_logs);
 
-        $this->command->info('架電記録のダミーデータを' . count($callLogs) . '件作成しました。');
+        $this->command->info('架電記録のダミーデータを' . count($call_logs) . '件作成しました。');
     }
 
-    private function generateNotes(string $result, string $companyName): string
+    private function generateNotes(string $result, string $company_name): string
     {
         return match ($result) {
             '通話成功' => fake()->randomElement([
-                "{$companyName}の担当者と良好な会話ができた。サービスに興味を示している。",
+                "{$company_name}の担当者と良好な会話ができた。サービスに興味を示している。",
                 "担当者は親切で、詳細な説明を聞いてくれた。次回アポ取りを検討。",
                 "現在のシステムに課題を感じており、解決策を探している。",
                 "予算感も含めて前向きに検討したいとのこと。提案書送付予定。"

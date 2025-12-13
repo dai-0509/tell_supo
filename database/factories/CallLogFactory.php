@@ -16,14 +16,14 @@ class CallLogFactory extends Factory
 
     public function definition(): array
     {
-        $startedAt = fake()->dateTimeBetween('-1 month', 'now');
-        $endedAt = fake()->optional(0.8)->dateTimeBetween($startedAt, 'now');
+        $started_at = fake()->dateTimeBetween('-1 month', 'now');
+        $ended_at = fake()->optional(0.8)->dateTimeBetween($started_at, 'now');
 
         return [
             'user_id' => User::factory(),
             'customer_id' => Customer::factory(),
-            'started_at' => $startedAt,
-            'ended_at' => $endedAt,
+            'started_at' => $started_at,
+            'ended_at' => $ended_at,
             'result' => fake()->randomElement(['通話成功', '受けブロ', '会話のみ', '見込みあり']),
             'notes' => fake()->optional(0.7)->realText(200),
         ];

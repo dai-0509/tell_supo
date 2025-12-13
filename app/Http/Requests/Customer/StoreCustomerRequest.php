@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Customer;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 
 class StoreCustomerRequest extends FormRequest
@@ -14,8 +15,8 @@ class StoreCustomerRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        // auth()->check()はLaravelの標準ヘルパー関数
-        return auth()->check();
+        // Auth::check()はLaravelの標準ヘルパー関数
+        return Auth::check();
     }
 
     /**
@@ -25,7 +26,7 @@ class StoreCustomerRequest extends FormRequest
      */
     public function rules(): array
     {
-        $userId = auth()->id();
+        $userId = Auth::id();
 
         return [
             'user_id' => ['required', 'integer', 'exists:users,id'],
@@ -106,9 +107,9 @@ class StoreCustomerRequest extends FormRequest
         }
 
         // user_idを自動設定
-        // auth()->id()はLaravelの標準ヘルパー関数
+        // Auth::id()はLaravelの標準ヘルパー関数
         $this->merge([
-            'user_id' => auth()->id(),
+            'user_id' => Auth::id(),
         ]);
     }
 }

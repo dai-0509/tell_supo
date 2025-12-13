@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Customer;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 
 class UpdateCustomerRequest extends FormRequest
@@ -17,8 +18,8 @@ class UpdateCustomerRequest extends FormRequest
         // route()メソッドはIlluminate\Http\Requestから継承
         $customer = $this->route('customer');
 
-        // auth()はLaravelの標準ヘルパー関数
-        return auth()->check() && $customer->user_id === auth()->id();
+        // Auth::はLaravelの標準ヘルパー関数
+        return Auth::check() && $customer->user_id === Auth::id();
     }
 
     /**
@@ -28,7 +29,7 @@ class UpdateCustomerRequest extends FormRequest
      */
     public function rules(): array
     {
-        $userId = auth()->id();
+        $userId = Auth::id();
         $customerId = $this->route('customer')->id;
 
         return [

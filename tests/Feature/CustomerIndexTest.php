@@ -35,16 +35,16 @@ class CustomerIndexTest extends TestCase
 
     public function test_他のユーザーの顧客は表示されない(): void
     {
-        $otherUser = User::factory()->create();
-        $myCustomer = Customer::factory()->create(['user_id' => $this->user->id]);
-        $otherCustomer = Customer::factory()->create(['user_id' => $otherUser->id]);
+        $other_user = User::factory()->create();
+        $my_customer = Customer::factory()->create(['user_id' => $this->user->id]);
+        $other_customer = Customer::factory()->create(['user_id' => $other_user->id]);
 
         $response = $this->actingAs($this->user)
             ->get(route('customers.index'));
 
         $response->assertStatus(200)
-            ->assertSee($myCustomer->company_name)
-            ->assertDontSee($otherCustomer->company_name);
+            ->assertSee($my_customer->company_name)
+            ->assertDontSee($other_customer->company_name);
     }
 
     public function test_顧客が0件の場合に空状態を表示する(): void
@@ -170,13 +170,13 @@ class CustomerIndexTest extends TestCase
 
     public function test_最新の顧客から順番に表示される(): void
     {
-        $oldCustomer = Customer::factory()->create([
+        $old_customer = Customer::factory()->create([
             'user_id' => $this->user->id,
             'company_name' => '古い会社',
             'created_at' => now()->subDays(2),
         ]);
 
-        $newCustomer = Customer::factory()->create([
+        $new_customer = Customer::factory()->create([
             'user_id' => $this->user->id,
             'company_name' => '新しい会社',
             'created_at' => now()->subDays(1),
@@ -186,11 +186,11 @@ class CustomerIndexTest extends TestCase
             ->get(route('customers.index'));
 
         $content = $response->getContent();
-        $newPos = strpos($content, '新しい会社');
-        $oldPos = strpos($content, '古い会社');
+        $new_pos = strpos($content, '新しい会社');
+        $old_pos = strpos($content, '古い会社');
 
         // 新しい会社が先に表示される
-        $this->assertTrue($newPos < $oldPos);
+        $this->assertTrue($new_pos < $old_pos);
     }
 
     public function test_未認証ユーザーはリダイレクトされる(): void

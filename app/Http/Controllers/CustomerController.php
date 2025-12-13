@@ -9,6 +9,7 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 
 /**
@@ -56,17 +57,17 @@ class CustomerController extends Controller
         $temperatures = $request->get('temperatures', []);
         $industries = $request->get('industries', []);
         $areas = $request->get('areas', []);
-        $sortBy = $request->get('sort', 'created_at');
+        $sort_by = $request->get('sort', 'created_at');
         $direction = $request->get('direction', 'desc');
 
         // 顧客データ取得（スコープチェーン適用）
-        $customers = Customer::forUser(auth()->id())
+        $customers = Customer::forUser(Auth::id())
             ->search($search)
             ->filterByStatuses($statuses)
             ->filterByTemperatures($temperatures)
             ->filterByIndustries($industries)
             ->filterByAreas($areas)
-            ->orderBy($sortBy, $direction)
+            ->orderBy($sort_by, $direction)
             ->paginate(20);
 
         // URLクエリパラメータを維持
@@ -177,7 +178,7 @@ class CustomerController extends Controller
      */
     public function apiIndex(): JsonResponse
     {
-        $customers = Customer::forUser(auth()->id())
+        $customers = Customer::forUser(Auth::id())
             ->select('id', 'company_name', 'contact_name')
             ->orderBy('company_name')
             ->get();

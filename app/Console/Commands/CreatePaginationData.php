@@ -38,23 +38,23 @@ class CreatePaginationData extends Command
         $this->info('ページネーション用のデータを作成中...');
 
         // 追加で20件の顧客（合計30件でページネーション表示）
-        $additionalCustomers = Customer::factory(20)->create([
+        $additional_customers = Customer::factory(20)->create([
             'user_id' => $user->id,
         ]);
 
         // 追加で20件の架電記録（合計30件でページネーション表示）
-        foreach ($additionalCustomers as $customer) {
+        foreach ($additional_customers as $customer) {
             CallLog::factory()->create([
                 'user_id' => $user->id,
                 'customer_id' => $customer->id,
             ]);
         }
 
-        $totalCustomers = Customer::where('user_id', $user->id)->count();
-        $totalCallLogs = CallLog::where('user_id', $user->id)->count();
+        $total_customers = Customer::where('user_id', $user->id)->count();
+        $total_call_logs = CallLog::where('user_id', $user->id)->count();
 
         $this->info("✅ 追加で20件の顧客と20件の架電記録を作成しました");
-        $this->info("📊 合計: 顧客{$totalCustomers}件、架電記録{$totalCallLogs}件");
+        $this->info("📊 合計: 顧客{$total_customers}件、架電記録{$total_call_logs}件");
         $this->info("🔄 ページネーションが表示されるはずです（20件/ページ）");
     }
 }

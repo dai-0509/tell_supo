@@ -27,6 +27,10 @@ Route::middleware(['auth'])->group(function () {
     // KPI管理
     Route::resource('kpi-targets', KpiTargetController::class)->parameters(['kpi-targets' => 'kpiTarget']);
     Route::post('kpi-targets/reset', [KpiTargetController::class, 'reset'])->name('kpi-targets.reset');
+    
+    // KPI計算API（AJAX用）
+    Route::post('kpi-targets/calculate-calls', [KpiTargetController::class, 'calculateRecommendedCalls'])->name('kpi-targets.calculate-calls');
+    Route::post('kpi-targets/distribute-weekly', [KpiTargetController::class, 'distributeWeeklyTarget'])->name('kpi-targets.distribute-weekly');
 
     // 既存ページ（TODO: F007実装時にダッシュボードページに置き換え予定）
     Route::view('/calls', 'pages.call-logs.index')->name('calls.index');

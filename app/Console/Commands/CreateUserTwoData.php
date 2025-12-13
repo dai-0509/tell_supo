@@ -55,11 +55,11 @@ class CreateUserTwoData extends Command
             ]);
         }
 
-        $totalCustomers = Customer::where('user_id', $user->id)->count();
-        $totalCallLogs = CallLog::where('user_id', $user->id)->count();
+        $total_customers = Customer::where('user_id', $user->id)->count();
+        $total_call_logs = CallLog::where('user_id', $user->id)->count();
 
         $this->info("✅ ユーザーID 2用に25件の顧客と25件の架電記録を作成しました");
-        $this->info("📊 合計: 顧客{$totalCustomers}件、架電記録{$totalCallLogs}件");
+        $this->info("📊 合計: 顧客{$total_customers}件、架電記録{$total_call_logs}件");
         $this->info("🔄 ページネーションが表示されます（20件/ページ）");
     }
 }

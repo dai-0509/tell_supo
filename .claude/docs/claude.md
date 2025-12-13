@@ -130,12 +130,14 @@ php artisan test
 - N+1クエリを含む実装
 - mainブランチでの`CLAUDE_TASK.md`残存
 - テストなしでのPR作成
+- BladeファイルへのJavaScript直接記述（必ず分離）
 
 ### 推奨事項
 - 小さな単位での実装依頼
 - 具体的な仕様の明示
 - エラーケースの網羅的テスト
 - UIのスクリーンショット確認
+- JavaScript は public/js/ に分離し、Blade から @vite で読み込み
 
 ## 📚 関連ドキュメント
 
